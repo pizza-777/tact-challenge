@@ -23,12 +23,11 @@ contract Task2 with Deployable {
         self.admin = admin;
     }
 
-    receive(msg: Refund){
-        nativeReserve(0, 2);
+    receive(msg: Refund){      
         if (sender() == self.admin) { 
             send(SendParameters{to: msg.sender, //+
                     value: 0, //+
-                    mode: SendRemainingBalance,
+                    mode: SendRemainingValue,
                     bounce: true
                 }
             );
