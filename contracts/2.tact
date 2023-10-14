@@ -11,7 +11,7 @@ import "@stdlib/deploy";
 */
 
 message(0x44) Bounced {
-    queryId: Int as uint64;
+    //queryId: Int as uint64;
     sender: Address;
 }
 
@@ -21,23 +21,32 @@ contract Task2 with Deployable {
         self.admin = admin;
     }
 
-    receive(msg: Bounced){
-        //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
-        send(SendParameters{
-            to: msg.sender,
-            value: 0,
+    // bounced(msg: Bounced){
+    //     //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
+    //     send(SendParameters{
+    //         to: msg.sender,//+
+    //         value: 0, //+
+    //         mode: SendRemainingValue + SendIgnoreErrors,
+    //         bounce: false
+    //       });
+    // }
+    
+    bounced(src: Slice) {
+          send(SendParameters{
+            to: src.loadAddress(),//+
+            value: 0, //+
             mode: SendRemainingValue + SendIgnoreErrors,
             bounce: false
           });
     }
-
+//почему -то много газа тратится. Выяснить почему?
     receive(msg: Slice){
        let body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()).endCell();//store original msg in the first ref in the outcoming body
        send(SendParameters{
-          to: self.admin, value: 0, 
+          to: self.admin, value: 0, //+
           mode: SendRemainingValue + SendIgnoreErrors, 
-          bounce: true,
-          body: body
+          bounce: true, //+
+          body: body //+
         });
     }
 }
