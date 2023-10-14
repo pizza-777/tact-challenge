@@ -21,16 +21,18 @@ contract Task2 with Deployable {
         self.admin = admin;
     }
 
-    // receive(msg: Bounced){
-    //     //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
-    //     send(SendParameters{
-    //         to: msg.sender,//+
-    //         value: context().value, //+
-    //         mode: 1,
-    //         bounce: true,
-    //         body: msg.toCell()
-    //       });
-    // }
+    receive(msg: Bounced){
+        //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
+        if(sender() == self.admin){
+        send(SendParameters{
+            to: msg.sender,//+
+            value: 0, //+
+            mode: SendRemainingValue + SendIgnoreErrors,
+            bounce: true,
+            body: msg.toCell()
+          });
+        }
+    }
     
     // bounced(msg: Slice) {
     //       send(SendParameters{
