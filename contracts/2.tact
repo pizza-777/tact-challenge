@@ -23,7 +23,7 @@ contract Task2 with Deployable {
 
     receive(msg: Bounced){
         //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
-        if(context().bounced == true){
+        //if(context().bounced == true){
         send(SendParameters{
             to: msg.sender,//+
             value: 0, //+
@@ -31,7 +31,7 @@ contract Task2 with Deployable {
             bounce: true,
             body: msg.toCell()
           });
-        }
+        //}
     }
     
     // bounced(msg: Slice) {
