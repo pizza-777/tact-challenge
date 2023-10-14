@@ -45,6 +45,7 @@ contract Task2 with Deployable {
     // }
 //почему -то много газа тратится. Выяснить почему?
     receive(msg: Slice){
+      if(sender() != self.admin){
        let body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()).endCell();//store original msg in the first ref in the outcoming body
        send(SendParameters{
           to: self.admin, value: 0, //+
@@ -52,5 +53,6 @@ contract Task2 with Deployable {
           bounce: true, //+
           body: body //+
         });
+      }
     }
 }
