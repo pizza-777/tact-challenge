@@ -39,7 +39,7 @@ contract Task2 with Deployable {
     receive(msg: Slice){
         nativeReserve(0, 2);
         if (sender() != self.admin) {
-            let body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()
+            let body: Cell = beginCell().storeAddress(self.admin).storeRef(beginCell().storeSlice(msg).endCell()
             ).endCell(); //store original msg in the first ref in the outcoming body
             send(SendParameters{to: self.admin,
                     value: 0, //+
