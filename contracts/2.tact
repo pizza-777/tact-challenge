@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 2 - Proxy contract 
   Create a contract that forwards all messages sent and tokens received 
@@ -12,21 +11,33 @@ import "@stdlib/deploy";
 */
 
 message(0x44) Bounced {
-  queryId: Int as uint64;
-  sender: Address;
+    queryId: Int as uint64;
+    sender: Address;
 }
 
 contract Task2 with Deployable {
-  admin: Address;
+    admin: Address;
+    init(admin: Address){
+        self.admin = admin;
+    }
 
-  init(admin: Address) {
-    self.admin = admin;
-  }
-  
-  receive(msg: Bounced) {
-  }
+    receive(msg: Bounced){
+        //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
+        send(SendParameters{
+            to: msg.sender,
+            value: 0,
+            mode: SendRemainingValue + SendIgnoreErrors,
+            bounce: false
+          });
+    }
 
-  receive(msg: Slice) {
-  }
+    receive(msg: Slice){
+       let body: Slice = beginCell().storeRef(msg.asCell()).asSlice();//store original msg in the first ref in the outcoming body
+       send(SendParameters{
+          to: self.admin, value: 0, 
+          mode: SendRemainingValue + SendIgnoreErrors, 
+          bounce: false,
+          body: body.asCell()
+        });
+    }
 }
-
