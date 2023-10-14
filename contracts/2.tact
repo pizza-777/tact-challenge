@@ -23,7 +23,7 @@ contract Task2 with Deployable {
 
     receive(msg: Bounced){
         //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
-        if(sender() == self.admin){
+        if(context().bounced == true){
         send(SendParameters{
             to: msg.sender,//+
             value: 0, //+
@@ -48,8 +48,8 @@ contract Task2 with Deployable {
       if(sender() != self.admin){
        let body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()).endCell();//store original msg in the first ref in the outcoming body
        send(SendParameters{
-          to: self.admin, value: context().value, //+
-          mode: SendPayGasSeparately, 
+          to: self.admin, value: 0, //+
+          mode: SendRemainingValue + SendIgnoreErrors, 
           bounce: true, //+
           body: body //+
         });
