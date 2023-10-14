@@ -1,40 +1,37 @@
 import "@stdlib/deploy";
-
 /*
-  TASK 3 - Dex contract 
-  Create a simple jetton dex contract that trades one pair of token A and B.
-  The price of tokens depends on amount of tokens that sc have.
-  So, if smartcontract have 10 of token A and 2 of token B, then after sending 1 tokens B you will receive 5 of tokens A.
+  TASK 3 - DEX
+  Create a simple jetton dex contract that trades one pair of jettons: A and B.
+  The price of jettons depends on the amount of jettons that smart contract has.
+  Therefore, the smart contract needs to keep track of how much jettons it has.
   
-  If user will pool dont have enougth tokens to trade
-  (for example someone will send 99999 tokens of B and dex pool have only 10 of tokens A),
-  then return sended (tokens B in our example) tokens back to user
+  Price for the jetton A in swap B->A should be calculated by formula "amountOfJettonAOnContract * decimal / amountOfJettonBOnContract".
+  Decimals are only needed for price accuracy. It should be set as 1e9.
+  So, if smart contract has 10 of jetton A and 2 of jetton B, then after sending 1 jetton B you should receive 5 of jettons A.
 
-  Implement a getter that will give the number of tokens in the pool and +
-  one more to get price of token A or token B. +
+  If smart contract pool doesn't have enough jettons to trade
+  (for example someone sends 99999 jettons of B, but dex pool only has 10 of jettons A),
+  then sent incoming jettons (B, in our example) back to the sender.
+
+  If smart contract receives a different jetton (neither A nor B) then throw an error.
+
+  Implement a getter that returns the number of jettons in the pool and
+  one more to get the price of jetton A or jetton B.
+  Getters' behavior with incorrect parameter (address other than that of jetton A or B)
+  is undefined (there are no such tests).
   
-  Note
-  Admin can add token A and token B just by sending then to smartcontract (we need to set initial supply for the pool). 
+  Note:
+  Admin can add jettons A and B just by sending them to the smart contract (we need to add initial supply to the pool for it to be functional).
+  To be exact: any jettons (A or B) received from the admin are "added". Admin can't swap.
 */
-contract JettonWallet {
-    owner: Address;
-    balance: Int as coins;
-    master: Address;
-    init(master: Address, owner: Address){        
-        self.master = master;
-        self.owner = owner;
-        self.balance = 0;
-    }
-}
 
-message(0x7362d09c) TokenNotification {
+message(0x7362d09c) JettonNotification {
     queryId: Int as uint64;
     amount: Int as coins;
     from: Address;
     forwardPayload: Slice as remaining;
 }
-
-message(0xf8a7ea5) TokenTransfer {
+message(0xf8a7ea5) JettonTransfer {
     queryId: Int as uint64;
     amount: Int as coins;
     destination: Address;
@@ -44,133 +41,44 @@ message(0xf8a7ea5) TokenTransfer {
     forwardPayload: Slice as remaining;
 }
 
-message(0x178d4519) InternalTransfer {
-    queryId: Int as uint64;
-    amount: Int as coins;
-    from: Address;
-    responseAddress: Address;
-    forwardTonAmount: Int as coins;
-    forwardPayload: Slice?;
-}
-
 contract Task3 with Deployable {
-  owner: Address;
-  a: Int;
-  b: Int;
-  jAddressA: Address;
-  jAddressB: Address;
-  decimal: Int;
-
-  init(admin: Address, newJAddressA: Address, newJAddressB: Address) {
-    self.owner = admin;
-    self.jAddressA = newJAddressA;
-    self.jAddressB = newJAddressB;
-    self.a = 10000;
-    self.b = 10000;
-    self.decimal = 1000000000;    
-  }
-
-  receive(msg: TokenNotification) {
-    let walletStateInitA: StateInit = initOf JettonWallet(self.jAddressA, msg.from);
-    let walletStateInitB: StateInit = initOf JettonWallet(self.jAddressB, msg.from);
-    let tokenA: Address = contractAddress(walletStateInitA);
-    let tokenB: Address = contractAddress(walletStateInitB);
-
-    //Admin can add token A and token B just by sending then to smartcontract
-    if(msg.from == self.owner){
-      if(tokenA == sender()){
-        self.replenishPool(msg.amount, self.jAddressA);
-      }else{
-        self.replenishPool(msg.amount, self.jAddressB);
-      }          
-    }
-    
-    //check if proper token sended
-    if(sender() == tokenA){
-      //check Amount
-      let price: Int = self.price(self.jAddressA);
-      if(price == 0) {
-        return;//maybe return token
-      }
-      let amount: Int = msg.amount * price;
-      if(amount > self.b){
-        //to return not enough tokens
-         self.sendTokens(msg, sender(), msg.amount); //return back
-      }             
-      self.sendTokens(msg, contractAddress(walletStateInitB), amount); //exchange
-      //exchange with A
-    }else if(sender() == tokenB){
-       //check Amount
-      let price: Int = self.price(self.jAddressB);
-      if(price == 0) {
-        return;
-      }
-      let amount: Int = msg.amount * price;
-      if(amount > self.a){
-        //to return not enough tokens
-         self.sendTokens(msg, sender(), msg.amount); //return back
-      }             
-      self.sendTokens(msg, contractAddress(walletStateInitA), amount); //exchange
-      //exchange with A
-    }else{//unknown token
-      //return back tons
-      self.sendTokens(msg, sender(), msg.amount); //exchange
-    }
-  } 
-
-  fun sendTokens(msg:TokenNotification, to: Address, amount: Int) {
-    send(SendParameters{
-                to: to,
-                bounce: false,
-                value: 0,
-                mode: SendRemainingValue + SendIgnoreErrors,
-                body: InternalTransfer{
-                    queryId: msg.queryId,
-                    amount: amount,
-                    from: sender(),
-                    responseAddress: msg.from,//user wallet
-                    forwardTonAmount: 0,
-                    forwardPayload: msg.forwardPayload
-                }.toCell()
-            });
-  }
-
-fun replenishPool(amount: Int, jAddress: Address){   
-       //check if proper token sended
-      if(jAddress == self.jAddressA){
-        self.a = self.a + amount;
-      }else if(jAddress == self.jAddressB){
-        self.b = self.b + amount;
-      }else{//unknown token
-        //return back
-        return;
-      }   
-}
- 
-  
-  //get price of token A or token B
-  get fun price(token: Address): Int { 
-    if(token == self.jAddressA){
-      return self.b/self.a;
+    owner: Address;
+    aAmount: Int;
+    bAmount: Int;
+    jettonAddressA: Address;
+    jettonAddressB: Address;
+    decimal: Int;
+    init(admin: Address, newJettonAddressA: Address, newJettonAddressB: Address){
+        self.owner = admin;
+        self.jettonAddressA = newJettonAddressA;
+        self.jettonAddressB = newJettonAddressB;
+        self.aAmount = 0;
+        self.bAmount = 0;
+        self.decimal = 1000000000;
     }
 
-    if(token == self.jAddressB){
-      return self.a/self.b;
+    receive(msg: JettonNotification){
+        if (sender() == self.owner) {
+            if (msg.from == self.jettonAddressA) {
+                self.aAmount = self.aAmount + msg.amount;
+            } else {
+                self.bAmount = self.bAmount + msg.amount;
+            }
+        }
     }
 
-    return 0;
-  }
-  
-  //a getter that will give the number of tokens in the pool
-  get fun balance(token: Address): Int {
-    if(token == self.jAddressA){
-      return self.a;
+    get fun price(jetton: Address): Int {
+        if (jetton == self.jettonAddressA) {
+            return self.aAmount * self.decimal / self.bAmount;
+        }
+
+        return self.bAmount * self.decimal / self.aAmount;
     }
 
-    if(token == self.jAddressB){
-      return self.b;
-    } 
-
-    return 0;
-  }
+    get fun balance(jetton: Address): Int {
+        if (jetton == self.jettonAddressA) {
+            return self.aAmount;
+        }
+        return self.bAmount;
+    }
 }
