@@ -58,7 +58,7 @@ contract Task3 with Deployable {
     }
 
     receive(msg: JettonNotification){
-      if(msg.from != self.jettonAddressA && msg.from !== self.jettonAddressB ){
+      if(msg.from != self.jettonAddressA && msg.from != self.jettonAddressB ){
         throw(1);
       }
         if (sender() == self.owner) {
