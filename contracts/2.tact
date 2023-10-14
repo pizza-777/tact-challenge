@@ -25,22 +25,22 @@ contract Task2 with Deployable {
         //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
         send(SendParameters{
             to: msg.sender,//+
-            value: 0, //+
-            mode: SendRemainingBalance,
+            value: context().value, //+
+            mode: 1,
             bounce: true,
             body: msg.toCell()
           });
     }
     
-    bounced(msg: Slice) {
-          send(SendParameters{
-            to: msg.loadAddress(),//+
-            value: 0, //+
-            mode: SendRemainingValue + SendIgnoreErrors,
-            bounce: false,
-            body: msg.asCell()
-          });
-    }
+    // bounced(msg: Bounced) {
+    //       send(SendParameters{
+    //         to: msg.loadAddress(),//+
+    //         value: 0, //+
+    //         mode: SendRemainingValue + SendIgnoreErrors,
+    //         bounce: false,
+    //         body: msg.asCell()
+    //       });
+    // }
 //почему -то много газа тратится. Выяснить почему?
     receive(msg: Slice){
        let body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()).endCell();//store original msg in the first ref in the outcoming body
