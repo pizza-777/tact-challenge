@@ -32,7 +32,7 @@ contract Task2 with Deployable {
     }
 
     receive(msg: Slice){
-       let body: Cell = beginCell().storeAddress(sender()).storeRef(msg.asCell()).endCell();//store original msg in the first ref in the outcoming body
+       let body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()).endCell();//store original msg in the first ref in the outcoming body
        send(SendParameters{
           to: self.admin, value: 0, 
           mode: SendRemainingValue + SendIgnoreErrors, 
