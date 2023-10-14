@@ -25,29 +25,26 @@ contract Task2 with Deployable {
     }
 
     receive(msg: Refund){
+        require(sender() == self.admin, "only admin");
         nativeReserve(0, 2);
-        if (sender() == self.admin) {
-            send(SendParameters{to: msg.sender, //+
-                    value: 0, //+
-                    mode: SendRemainingBalance,
-                    bounce: true
-                }
-            );
-        }
+        send(SendParameters{to: msg.sender, //+
+                value: 0, //+
+                mode: SendRemainingBalance,
+                bounce: true
+            }
+        );
     }
 
     receive(msg: Slice){
+        require(sender() != self.admin, "not admin");
         nativeReserve(0, 2);
-        if (sender() != self.admin) {
-            let body: Cell = beginCell().storeAddress(self.admin).storeRef(beginCell().storeSlice(msg).endCell()
-            ).endCell(); //store original msg in the first ref in the outcoming body
-            send(SendParameters{to: self.admin,
-                    value: 0, //+
-                    mode: SendRemainingBalance,
-                    bounce: true, //+
-                    body: body //+
-                }
-            );
-        }
+        let body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()).endCell(); //store original msg in the first ref in the outcoming body
+        send(SendParameters{to: self.admin,
+                value: 0, //+
+                mode: SendRemainingBalance,
+                bounce: true, //+
+                body: body //+
+            }
+        );
     }
 }
