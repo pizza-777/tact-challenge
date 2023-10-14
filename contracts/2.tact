@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 2 - Proxy 
   Create a contract that forwards all received TONs
@@ -13,8 +14,8 @@ import "@stdlib/deploy";
 */
 
 message(0x44) Refund {
-  queryId: Int as uint64;
-  sender: Address;
+    queryId: Int as uint64;
+    sender: Address;
 }
 
 contract Task2 with Deployable {
@@ -23,11 +24,12 @@ contract Task2 with Deployable {
         self.admin = admin;
     }
 
-    receive(msg: Refund){      
-        if (sender() == self.admin) { 
+    receive(msg: Refund){
+        nativeReserve(0, 2);
+        if (sender() == self.admin) {
             send(SendParameters{to: msg.sender, //+
                     value: 0, //+
-                    mode: SendRemainingValue,
+                    mode: SendRemainingBalance,
                     bounce: true
                 }
             );
@@ -36,13 +38,16 @@ contract Task2 with Deployable {
 
     receive(msg: Slice){
         nativeReserve(0, 2);
-        let body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()).endCell(); //store original msg in the first ref in the outcoming body
-        send(SendParameters{to: self.admin,
-                value: 0, //+
-                mode: SendRemainingBalance,
-                bounce: true, //+
-                body: body //+
-            }
-        );
+        if (sender() != self.admin) {
+            let body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()
+            ).endCell(); //store original msg in the first ref in the outcoming body
+            send(SendParameters{to: self.admin,
+                    value: 0, //+
+                    mode: SendRemainingBalance,
+                    bounce: true, //+
+                    body: body //+
+                }
+            );
+        }
     }
 }
