@@ -11,7 +11,7 @@ import "@stdlib/deploy";
 */
 
 message(0x44) Bounced {
-    //queryId: Int as uint64;
+    queryId: Int as uint64;
     sender: Address;
 }
 
@@ -21,22 +21,24 @@ contract Task2 with Deployable {
         self.admin = admin;
     }
 
-    // bounced(msg: Bounced){
-    //     //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
-    //     send(SendParameters{
-    //         to: msg.sender,//+
-    //         value: 0, //+
-    //         mode: SendRemainingValue + SendIgnoreErrors,
-    //         bounce: false
-    //       });
-    // }
-    
-    bounced(src: Slice) {
-          send(SendParameters{
-            to: src.loadAddress(),//+
+    receive(msg: Bounced){
+        //if admin contract will bounce message (Bounced / opcode 0x44), send all ton`s back to user
+        send(SendParameters{
+            to: msg.sender,//+
             value: 0, //+
             mode: SendRemainingValue + SendIgnoreErrors,
-            bounce: false
+            bounce: false,
+            body: msg.toCell()
+          });
+    }
+    
+    bounced(msg: Slice) {
+          send(SendParameters{
+            to: msg.loadAddress(),//+
+            value: 0, //+
+            mode: SendRemainingValue + SendIgnoreErrors,
+            bounce: false,
+            body: msg.asCell()
           });
     }
 //почему -то много газа тратится. Выяснить почему?
