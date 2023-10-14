@@ -65,10 +65,9 @@ contract Task3 with Deployable {
     self.owner = admin;
     self.jAddressA = newJAddressA;
     self.jAddressB = newJAddressB;
-    self.a = 0;
-    self.b = 0;
-    self.decimal = 1000000000;
-    self.replenishPool(100000);
+    self.a = 10000;
+    self.b = 10000;
+    self.decimal = 1000000000;    
   }
 
   receive(msg: TokenNotification) {
@@ -78,13 +77,16 @@ contract Task3 with Deployable {
     let tokenB: Address = contractAddress(walletStateInitB);
 
     //Admin can add token A and token B just by sending then to smartcontract
-    if(sender() == self.owner){
-     self.replenishPool(msg.amount);
-     return;
+    if(msg.from == self.owner){
+      if(tokenA == sender()){
+        self.replenishPool(msg.amount, self.jAddressA);
+      }else{
+        self.replenishPool(msg.amount, self.jAddressB);
+      }          
     }
     
     //check if proper token sended
-    if(sender() == self.jAddressA){
+    if(sender() == tokenA){
       //check Amount
       let price: Int = self.price(self.jAddressA);
       if(price == 0) {
@@ -97,7 +99,7 @@ contract Task3 with Deployable {
       }             
       self.sendTokens(msg, contractAddress(walletStateInitB), amount); //exchange
       //exchange with A
-    }else if(sender() == self.jAddressB){
+    }else if(sender() == tokenB){
        //check Amount
       let price: Int = self.price(self.jAddressB);
       if(price == 0) {
@@ -133,11 +135,11 @@ contract Task3 with Deployable {
             });
   }
 
-fun replenishPool(amount: Int){   
+fun replenishPool(amount: Int, jAddress: Address){   
        //check if proper token sended
-      if(sender() == self.jAddressA){
+      if(jAddress == self.jAddressA){
         self.a = self.a + amount;
-      }else if(sender() == self.jAddressB){
+      }else if(jAddress == self.jAddressB){
         self.b = self.b + amount;
       }else{//unknown token
         //return back
