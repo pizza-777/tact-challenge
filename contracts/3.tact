@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -38,7 +37,6 @@ message(0x7362d09c) TokenNotification {
     from: Address;
     forwardPayload: Slice as remaining;
 }
-
 message(0xf8a7ea5) TokenTransfer {
     queryId: Int as uint64;
     amount: Int as coins;
@@ -50,49 +48,49 @@ message(0xf8a7ea5) TokenTransfer {
 }
 
 contract Task3 with Deployable {
-  owner: Address;
-  aAmount: Int;
-  bAmount: Int;
-  jettonAddressA: Address;
-  jettonAddressB: Address;
-  decimal: Int;
-
-  init(admin: Address, newJettonAddressA: Address, newJettonAddressB: Address) {
-    self.owner = admin;
-    self.jettonAddressA = newJettonAddressA;
-    self.jettonAddressB = newJettonAddressB;
-    self.aAmount = 0;
-    self.bAmount = 0;
-    self.decimal = 1000000000;
-  }
-
-  receive(msg: TokenNotification) {
-    let jetton:Address = msg.forwardPayload.loadAddress();
-    if(jetton != self.jettonAddressA && jetton != self.jettonAddressB){
-      throw(1);
-    }
-  } 
-  
-  // Price for the jetton A in swap B->A should be calculated by formula "amountOfJettonAOnContract * decimal / amountOfJettonBOnContract".
-  // Token prices must be decimalized for accuracy, so it is the prices that must be adjusted to decimal 1e9.
-  // Decimals are only needed for price accuracy. It should be set as 1e9.
-  // So, if smart contract has 10 of jetton A and 2 of jetton B, then after sending 1 jetton B you should receive 5 of jettons A.
-  get fun price(jetton: Address): Int { 
-    if(jetton == self.jettonAddressA){
-      return self.aAmount * self.decimal / self.bAmount;
+    owner: Address;
+    aAmount: Int;
+    bAmount: Int;
+    jettonAddressA: Address;
+    jettonAddressB: Address;
+    decimal: Int;
+    jetton: Address?;
+    init(admin: Address, newJettonAddressA: Address, newJettonAddressB: Address){
+        self.owner = admin;
+        self.jettonAddressA = newJettonAddressA;//dex jetton wallet A
+        self.jettonAddressB = newJettonAddressB;//dex jetton wallet B
+        self.aAmount = 0;
+        self.bAmount = 0;
+        self.decimal = 1000000000;
     }
 
-    return self.bAmount * self.decimal / self.aAmount;
-  }
-  
-  // Implement a getter that returns the number of jettons in the pool and
-  // one more to get the price of jetton A or jetton B.
-  // Getters' behavior with incorrect parameter (address other than that of jetton A or B)
-  // is undefined (there are no such tests).
-  get fun balance(jetton: Address): Int { 
-    if(jetton == self.jettonAddressA){
-      return self.aAmount;
+    receive(msg: TokenNotification){
+      require(sender() == self.jettonAddressA || sender() == self.jettonAddressB, "Wrong sender");
     }
-    return self.bAmount;
-  }
+
+    get fun jetton():Address{
+      return self.jetton!!;
+    }
+
+    // Price for the jetton A in swap B->A should be calculated by formula "amountOfJettonAOnContract * decimal / amountOfJettonBOnContract".
+    // Token prices must be decimalized for accuracy, so it is the prices that must be adjusted to decimal 1e9.
+    // Decimals are only needed for price accuracy. It should be set as 1e9.
+    // So, if smart contract has 10 of jetton A and 2 of jetton B, then after sending 1 jetton B you should receive 5 of jettons A.
+    get fun price(jetton: Address): Int {
+        if (jetton == self.jettonAddressA) {
+            return self.aAmount * self.decimal / self.bAmount;
+        }
+        return self.bAmount * self.decimal / self.aAmount;
+    }
+
+    // Implement a getter that returns the number of jettons in the pool and
+    // one more to get the price of jetton A or jetton B.
+    // Getters' behavior with incorrect parameter (address other than that of jetton A or B)
+    // is undefined (there are no such tests).
+    get fun balance(jetton: Address): Int {
+        if (jetton == self.jettonAddressA) {
+            return self.aAmount;
+        }
+        return self.bAmount;
+    }
 }
