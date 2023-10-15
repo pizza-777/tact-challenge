@@ -67,10 +67,22 @@ contract Task3 with Deployable {
   }
 
   receive(msg: TokenNotification) {
+    let jetton:Address = msg.forwardPayload.loadAddress();
+    if(jetton != self.jettonAddressA && jetton != self.jettonAddressB){
+      throw(1);
+    }
   } 
   
+  // Price for the jetton A in swap B->A should be calculated by formula "amountOfJettonAOnContract * decimal / amountOfJettonBOnContract".
+  // Token prices must be decimalized for accuracy, so it is the prices that must be adjusted to decimal 1e9.
+  // Decimals are only needed for price accuracy. It should be set as 1e9.
+  // So, if smart contract has 10 of jetton A and 2 of jetton B, then after sending 1 jetton B you should receive 5 of jettons A.
   get fun price(jetton: Address): Int { 
-    return 0;
+    if(jetton == self.jettonAddressA){
+      return self.aAmount * self.decimal / self.bAmount;
+    }
+
+    return self.bAmount * self.decimal / self.aAmount;
   }
   
   // Implement a getter that returns the number of jettons in the pool and
