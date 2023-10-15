@@ -71,6 +71,7 @@ contract Task4 with Deployable {
                 }
             );
         }else{
+          //period of time is maybe 100 second (count of seconds)
           self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time  
           self.nft = sender();  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
@@ -79,7 +80,7 @@ contract Task4 with Deployable {
 
     receive(msg: NftWithdrawal){
         require(sender() != self.owner, "Invalid sender");
-        if ((self.lockedTime - now()) > 0) {
+        if ((self.lockedTime > now())) {
             send(SendParameters{to: sender(),
                     value: 0,
                     mode: SendRemainingValue,
@@ -114,7 +115,7 @@ contract Task4 with Deployable {
     }
 
     get fun time(): Int {      
-        return self.lockedTime;      
+        return self.lockedTime;    //correct. So its time before in timestamp seconds  
     }
 
     get fun nft(): Address? {
