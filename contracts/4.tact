@@ -53,8 +53,7 @@ contract Task4 with Deployable {
     }
 
     receive(msg: OwnershipAssigned){
-        self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time
-        let prewOwner: Address = msg.forwardPayload.loadAddress(); // load address of previous owner
+        self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time        
         if (self.nft != null) { //if nft already holded - return nft back to the sender (nft contract)
             //return back nft
             send(SendParameters{
