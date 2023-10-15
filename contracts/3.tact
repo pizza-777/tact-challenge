@@ -73,7 +73,14 @@ contract Task3 with Deployable {
     return 0;
   }
   
+  // Implement a getter that returns the number of jettons in the pool and
+  // one more to get the price of jetton A or jetton B.
+  // Getters' behavior with incorrect parameter (address other than that of jetton A or B)
+  // is undefined (there are no such tests).
   get fun balance(jetton: Address): Int { 
-    return 0;
+    if(jetton == self.jettonAddressA){
+      return self.aAmount;
+    }
+    return self.bAmount;
   }
 }
