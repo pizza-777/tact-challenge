@@ -57,48 +57,58 @@ contract Task3 with Deployable {
     jetton: Address?;
     init(admin: Address, newJettonAddressA: Address, newJettonAddressB: Address){
         self.owner = admin;
-        self.jettonAddressA = newJettonAddressA;//dex jetton wallet A
-        self.jettonAddressB = newJettonAddressB;//dex jetton wallet B
+        self.jettonAddressA = newJettonAddressA; //dex jetton wallet A
+        self.jettonAddressB = newJettonAddressB; //dex jetton wallet B
         self.aAmount = 0;
         self.bAmount = 0;
         self.decimal = 1000000000;
     }
 
     receive(msg: TokenNotification){
-      if(sender() != self.jettonAddressA && sender() != self.jettonAddressB){
-        throw(1);
-      }
-      if(msg.from == self.owner){
-        if(sender() == self.jettonAddressA){
-            self.aAmount = self.aAmount + msg.amount;
-        }else{
-            self.bAmount = self.bAmount + msg.amount;
+        if (sender() != self.jettonAddressA && sender() != self.jettonAddressB) {
+            throw(1);
         }
-        return;
-      }
-     
+        if (msg.from == self.owner) {
+            if (sender() == self.jettonAddressA) {
+                self.aAmount = self.aAmount + msg.amount;
+            } else {
+                self.bAmount = self.bAmount + msg.amount;
+            }
+            return ;
+        }
+        if (sender() == self.jettonAddressA) {
+            if(msg.amount > self.aAmount){
+
+            }
+            return;
+        } else {
+            if(msg.amount > self.bAmount){
+
+            }
+            return;
+        }
     }
 
-//     fun transferJetton(msg: TokenNotification){
-//         send(SendParameters{
-//             to: to,
-//             value: value,
-//             bounce: true,
-//             mode: SendIgnoreErrors + SendRemainingValue,
-//             body: TokenTransfer {
-//     queryId: queryId,
-//     amount: amount,
-//     destination: destination
-//     responseDestination: Address?;
-//     customPayload: Cell?;
-//     forwardTonAmount: Int as coins;
-//     forwardPayload: Slice as remaining;
-// }
-//         })
-//     }
+    //     fun transferJetton(msg: TokenNotification){
+    //         send(SendParameters{
+    //             to: to,
+    //             value: value,
+    //             bounce: true,
+    //             mode: SendIgnoreErrors + SendRemainingValue,
+    //             body: TokenTransfer {
+    //     queryId: queryId,
+    //     amount: amount,
+    //     destination: destination
+    //     responseDestination: Address?;
+    //     customPayload: Cell?;
+    //     forwardTonAmount: Int as coins;
+    //     forwardPayload: Slice as remaining;
+    // }
+    //         })
+    //     }
 
-    get fun jetton():Address{
-      return self.jetton!!;
+    get fun jetton(): Address {
+        return self.jetton!!;
     }
 
     // Price for the jetton A in swap B->A should be calculated by formula "amountOfJettonAOnContract * decimal / amountOfJettonBOnContract".
