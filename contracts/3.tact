@@ -65,15 +65,35 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-    //  require(sender() == self.jettonAddressA && sender() == self.jettonAddressB, "Wrong sender");
+      require(sender() != self.jettonAddressA && sender() != self.jettonAddressB, "Wrong jetton");
       if(msg.from == self.owner){
         if(sender() == self.jettonAddressA){
             self.aAmount = self.aAmount + msg.amount;
         }else{
             self.bAmount = self.bAmount + msg.amount;
         }
+        return;
       }
+     
     }
+
+//     fun transferJetton(msg: TokenNotification){
+//         send(SendParameters{
+//             to: to,
+//             value: value,
+//             bounce: true,
+//             mode: SendIgnoreErrors + SendRemainingValue,
+//             body: TokenTransfer {
+//     queryId: queryId,
+//     amount: amount,
+//     destination: destination
+//     responseDestination: Address?;
+//     customPayload: Cell?;
+//     forwardTonAmount: Int as coins;
+//     forwardPayload: Slice as remaining;
+// }
+//         })
+//     }
 
     get fun jetton():Address{
       return self.jetton!!;
