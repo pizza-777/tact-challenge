@@ -70,8 +70,7 @@ contract Task4 with Deployable {
                     }.toCell()
                 }
             );
-        }else{
-          //period of time is maybe 100 second (count of seconds)
+        }else{         
           self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time  
           self.nft = sender();  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
@@ -94,7 +93,7 @@ contract Task4 with Deployable {
             //send message Transfer
             //
             send(SendParameters{
-                  to: msg.nftAddress,
+                  to: self.nft!!,
                   value: 0,
                   mode: SendRemainingValue,
                   bounce: true,
