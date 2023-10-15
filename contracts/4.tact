@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 4 - NFT locker
   Implement a smart contract that will lock NFT for a period of time specified by the owner.
@@ -29,64 +28,96 @@ import "@stdlib/deploy";
 message(0x05138d91) OwnershipAssigned {
     queryId: Int as uint64;
     prevOwner: Address;
-    forwardPayload: Slice as remaining; 
+    forwardPayload: Slice as remaining;
 }
-
-message(0x5fcc3d14) Transfer { 
-    queryId: Int as uint64;            
-    newOwner: Address; 
-    responseDestination: Address; 
-    customPayload: Cell?; 
-    forwardAmount: Int as coins; 
-    forwardPayload: Slice as remaining; 
+message(0x5fcc3d14) Transfer {
+    queryId: Int as uint64;
+    newOwner: Address;
+    responseDestination: Address; //address where to send a response with confirmation of a successful transfer and the rest of the incoming message coins.
+    customPayload: Cell?;
+    forwardAmount: Int as coins;
+    forwardPayload: Slice as remaining;
 }
-
 message NftWithdrawal {
-  queryId: Int as uint64;
-  nftAddress: Address;
+    queryId: Int as uint64;
+    nftAddress: Address;
 }
 
 contract Task4 with Deployable {
-  seed: Int as uint128;
-
-  lockedTime: Int as uint32 = 0;
-  owner: Address?;
-  nft: Address?;
-  
-  init(seed: Int) {
-    self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
-  }
-
-  receive(msg: OwnershipAssigned) {
-    self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time
-    let prewOwner: Address = msg.forwardPayload.loadAddress();// load address of previous owner
-    require(self.nft != null, "Allready holds nft");
-  }
-
-  receive(msg: NftWithdrawal) {
-    require(sender() != self.owner, "Invalid sender");
-    if(null != self.lockedTime && self.lockedTime > now()){
-      send(SendParameters{
-        to: sender(),
-        value: 0,
-        mode: SendRemainingValue,
-        body: "NFT is still locked".asComment() // ? is it according to the TON's "message with text comment" standard ?
-      });
-    }else{
-      //what does it "mean send nft?"
-      //maybe ownership assigned for new owner
+    seed: Int as uint128;
+    lockedTime: Int as uint32 = 0; //кто его устанавливает ,овнер? 
+    owner: Address?;
+    nft: Address?;
+    init(seed: Int){
+        self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
     }
-  }
 
-  get fun time(): Int {
-    return self.lockedTime;
-  }
+    receive(msg: OwnershipAssigned){
+        self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time
+        let prewOwner: Address = msg.forwardPayload.loadAddress(); // load address of previous owner
+        if (self.nft != null) { //if nft already holded - return nft back to the sender (nft contract)
+            //return back nft
+            send(SendParameters{
+                    to: sender(),//is it self.nft item address?
+                    value: 0,
+                    mode: SendRemainingValue,
+                    bounce: true,
+                    body: Transfer{
+                      queryId: msg.queryId,
+                      newOwner: msg.prevOwner,
+                      responseDestination: msg.prevOwner,    
+                      forwardAmount: 0,
+                      forwardPayload: msg.forwardPayload,
+                      customPayload: null 
+                    }.toCell()
+                }
+            );
+        }
+    }
 
-  get fun nft(): Address? {
-    return self.nft;
-  }
+    receive(msg: NftWithdrawal){
+        require(sender() != self.owner, "Invalid sender");
+        if (null != self.lockedTime && self.lockedTime < now()) {
+            send(SendParameters{to: sender(),
+                    value: 0,
+                    mode: SendRemainingValue,
+                    body: "NFT is still locked".asComment() // ? is it according to the TON's "message with text comment" standard ?
+                }
+            );
+        } else {
+            //what does it "mean send nft?"
+            //maybe ownership assigned for new owner
+            //look at this https://github.com/howardpen9/nft-template-in-tact/blob/84b33672a58e68eb6b6714c65c809426224231b1/sources/contract.tact
+            //send message Transfer
+            //
+            send(SendParameters{
+                  to: msg.nftAddress,
+                  value: 0,
+                  mode: SendRemainingValue,
+                  bounce: true,
+                  body: Transfer{
+                      queryId: msg.queryId,                      
+                      newOwner: self.owner!!,
+                      responseDestination: self.owner!!,    
+                      forwardAmount: 0,
+                      customPayload: null,
+                      forwardPayload: beginCell().storeAddress(self.owner!!).endCell().asSlice()
+    
+                    }.toCell()
+                }
+            );
+        }
+    }
 
-  get fun owner(): Address? {
-    return self.owner;
-  }
+    get fun time(): Int {
+        return self.lockedTime;
+    }
+
+    get fun nft(): Address? {
+        return self.nft;
+    }
+
+    get fun owner(): Address? {
+        return self.owner;
+    }
 }
