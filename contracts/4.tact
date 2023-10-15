@@ -79,7 +79,7 @@ contract Task4 with Deployable {
 
     receive(msg: NftWithdrawal){
         require(sender() != self.owner, "Invalid sender");
-        if (self.lockedTime < now()) {
+        if ((self.lockedTime - now()) > 0) {
             send(SendParameters{to: sender(),
                     value: 0,
                     mode: SendRemainingValue,
@@ -113,8 +113,8 @@ contract Task4 with Deployable {
         }
     }
 
-    get fun time(): Int {
-        return self.lockedTime;
+    get fun time(): Int {      
+        return self.lockedTime - now();      
     }
 
     get fun nft(): Address? {
