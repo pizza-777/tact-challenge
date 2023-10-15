@@ -79,7 +79,7 @@ contract Task5 with Deployable {
     self.nftCollection = emptyMap();
     self.adminProfit = 0;
   }
-
+ 
   receive(msg: OwnershipAssigned) {
     if(msg.prevOwner == self.owner){
       self.nftCollection.set(self.totalNftsHeld, sender());
@@ -131,10 +131,6 @@ contract Task5 with Deployable {
         }.toCell()});
   }
 
-  fun randomNft() {
-
-  }
-
   receive(msg: AdminWithdrawalProfit) {
     //check the sender is admin
     require(sender() == self.owner, "Insufficient privelegies");
@@ -152,8 +148,24 @@ contract Task5 with Deployable {
   receive(msg: AdminWithdrawalAllNFTs) {
     require(context().value >= (1000000000 + self.totalNftsHeld * 80000000), "Insufficent funds");//todo if doesn't work throw error (not require)
     require(sender() == self.owner, "Invalid sender");
-
-    //todo send nfts
+    // If all checks pass, SC should send NFTs one by one to the admin 
+    // SC should be able to withdraw all NFTs by a single message from admin
+    while(self.totalNftsHeld > 0){
+      self.totalNftsHeld = self.totalNftsHeld - 1;
+      send(SendParameters{
+        to: self.nftCollection.get(self.totalNftsHeld)!!,
+        value: ton("0.1"),//check it ?
+        mode: 0,
+        bounce: true,
+        body: Transfer{
+          queryId: 0,            
+          newOwner: self.owner, 
+          responseDestination: self.owner,     
+          forwardAmount: 0, 
+          customPayload: emptyCell(),
+          forwardPayload: emptySlice() 
+        }.toCell()});
+    }
   }
 //returns how much collected fees is available to withdraw for the admin (all fees minus 0.1 TON)
   get fun profit(): Int { 
