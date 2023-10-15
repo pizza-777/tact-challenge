@@ -65,7 +65,10 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-      require(sender() == self.jettonAddressA || sender() == self.jettonAddressB, "Wrong sender");
+      require(sender() == self.jettonAddressA && sender() == self.jettonAddressB, "Wrong sender");
+      if(msg.from == self.owner){
+        
+      }
     }
 
     get fun jetton():Address{
