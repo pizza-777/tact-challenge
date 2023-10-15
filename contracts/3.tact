@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -65,9 +66,6 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        if (sender() != self.jettonAddressA && sender() != self.jettonAddressB) {
-            throw(1);
-        }
         if (msg.from == self.owner) {
             if (sender() == self.jettonAddressA) {
                 self.aAmount = self.aAmount + msg.amount;
@@ -77,15 +75,48 @@ contract Task3 with Deployable {
             return ;
         }
         if (sender() == self.jettonAddressA) {
-            if(msg.amount > self.aAmount){
-
+            if (msg.amount > self.aAmount) {
+                return ;
             }
-            return;
+        } else if (sender() == self.jettonAddressA) {
+            if (msg.amount > self.bAmount) {
+                return ;
+            }
         } else {
-            if(msg.amount > self.bAmount){
-
-            }
-            return;
+            throw(1); //unknown token
+        }
+        if (sender() == self.jettonAddressA) {
+            let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
+            send(SendParameters{to: sender(),
+                    value: 0,
+                    bounce: true,
+                    mode: SendIgnoreErrors + SendRemainingValue,
+                    body: TokenTransfer{queryId: msg.queryId,
+                        amount: amount,
+                        destination: msg.from,
+                        responseDestination: msg.from,
+                        customPayload: emptyCell(),
+                        forwardTonAmount: 0,
+                        forwardPayload: msg.forwardPayload
+                    }.toCell()
+                }
+            );
+        } else {
+            let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
+            send(SendParameters{to: sender(),
+                    value: 0,
+                    bounce: true,
+                    mode: SendIgnoreErrors + SendRemainingValue,
+                    body: TokenTransfer{queryId: msg.queryId,
+                        amount: amount,
+                        destination: msg.from,
+                        responseDestination: msg.from,
+                        customPayload: emptyCell(),
+                        forwardTonAmount: 0,
+                        forwardPayload: msg.forwardPayload
+                    }.toCell()
+                }
+            );
         }
     }
 
