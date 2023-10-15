@@ -52,8 +52,7 @@ contract Task4 with Deployable {
         self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
     }
 
-    receive(msg: OwnershipAssigned){
-        self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time        
+    receive(msg: OwnershipAssigned){            
         if (self.nft != null) { //if nft already holded - return nft back to the sender (nft contract)
             //return back nft
             send(SendParameters{
@@ -66,17 +65,21 @@ contract Task4 with Deployable {
                       newOwner: msg.prevOwner,
                       responseDestination: msg.prevOwner,    
                       forwardAmount: 0,
-                      forwardPayload: msg.forwardPayload,
+                      forwardPayload: msg.forwardPayload,//? should I need to change prevOwner? No
                       customPayload: null 
                     }.toCell()
                 }
             );
+        }else{
+          self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time  
+          self.nft = sender();  // nft item contract
+          self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
         }
     }
 
     receive(msg: NftWithdrawal){
         require(sender() != self.owner, "Invalid sender");
-        if (null != self.lockedTime && self.lockedTime < now()) {
+        if (self.lockedTime < now()) {
             send(SendParameters{to: sender(),
                     value: 0,
                     mode: SendRemainingValue,
@@ -100,11 +103,13 @@ contract Task4 with Deployable {
                       responseDestination: self.owner!!,    
                       forwardAmount: 0,
                       customPayload: null,
-                      forwardPayload: beginCell().storeAddress(self.owner!!).endCell().asSlice()
-    
+                      forwardPayload: emptyCell().asSlice()    
                     }.toCell()
                 }
             );
+            self.nft = null;
+            self.owner = null;
+            self.lockedTime = 0;
         }
     }
 
@@ -113,7 +118,7 @@ contract Task4 with Deployable {
     }
 
     get fun nft(): Address? {
-        return self.nft;
+        return self.nft;//check if null needed?
     }
 
     get fun owner(): Address? {
