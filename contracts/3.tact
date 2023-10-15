@@ -68,6 +68,7 @@ contract Task3 with Deployable {
         if (msg.from != self.owner) {
             if (sender() == self.jettonAddressA) {
                 let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
+                self.bAmount = self.bAmount - amount;
                 send(SendParameters{to: self.jettonAddressB,
                         value: 0,
                         bounce: true,
@@ -82,9 +83,11 @@ contract Task3 with Deployable {
                         }.toCell()
                     }
                 );
+                return;
             }
             if (sender() == self.jettonAddressB) {
                 let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
+                self.aAmount = self.aAmount - amount;
                 send(SendParameters{to: self.jettonAddressA,
                         value: 0,
                         bounce: true,
