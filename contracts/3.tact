@@ -86,7 +86,7 @@ contract Task3 with Deployable {
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;
             self.swapJettons(msg, self.jettonAddressB, amount);
-        }
+        }else
         if (sender() == self.jettonAddressB) {
             dump("jettonB received");
             let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
