@@ -66,19 +66,20 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
+        nativeReserve(0, 2);
        if(sender() != self.jettonAddressA && sender() != self.jettonAddressB){
         throw(1);
        }
         dump("start");
         if (msg.from == self.owner) {
             self.ifOwner(msg);
-            return ;
-        }
+           
+        }else
         if (self.checkAmount(msg) == false) {
             dump("stop processing, large amount");
-            return ;
-        }
-        dump("not owner");
+            
+        }else
+        //dump("not owner");
         if (sender() == self.jettonAddressA) {
             dump("jettonA received");
             let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
@@ -133,7 +134,7 @@ contract Task3 with Deployable {
         send(SendParameters{to: to,
                 value: 0,
                 bounce: false,
-                mode: SendIgnoreErrors + SendRemainingValue,
+                mode: SendRemainingBalance,
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: msg.amount,
                     destination: msg.from,
@@ -152,7 +153,7 @@ contract Task3 with Deployable {
         send(SendParameters{to: to,
                 value: 0,
                 bounce: false,
-                mode: SendIgnoreErrors + SendRemainingValue,
+                mode: SendRemainingBalance,
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: amount,
                     destination: msg.from,
