@@ -170,6 +170,9 @@ contract Task5 with Deployable {
   }
 //returns how much collected fees is available to withdraw for the admin (all fees minus 0.1 TON)
   get fun profit(): Int { 
+    if(self.adminProfit < ton("0.1")){
+      return 0;
+    }
     return self.adminProfit - ton("0.1");
   }
   //- returns dict of held NFTs with NFT indexes (sequential numbers from 0, 1, 2 ... and up to 'totalNftsHeld-1')
