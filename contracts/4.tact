@@ -79,6 +79,7 @@ contract Task4 with Deployable {
 
     receive(msg: NftWithdrawal){
         require(sender() != self.owner, "Invalid sender");
+        require(self.lockedTime > 0, "Locked time not set");
         if ((self.lockedTime > now())) {
             send(SendParameters{to: sender(),
                     value: 0,
@@ -114,7 +115,7 @@ contract Task4 with Deployable {
     }
 
     get fun time(): Int {      
-        return self.lockedTime;    //correct. So its time before in timestamp seconds  
+        return self.lockedTime - now();    //correct. So its time before in timestamp seconds  
     }
 
     get fun nft(): Address? {
