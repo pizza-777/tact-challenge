@@ -80,14 +80,14 @@ contract Task3 with Deployable {
             
         }else
         //dump("not owner");
-        if (sender() == self.jettonAddressA) {
+        if (sender() == self.jettonAddressB) {
             dump("jettonA received");
             let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;
             self.swapJettons(msg, self.jettonAddressB, amount);
         }
-        if (sender() == self.jettonAddressB) {
+        if (sender() == self.jettonAddressA) {
             dump("jettonB received");
             let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
             self.aAmount = self.aAmount - amount;
