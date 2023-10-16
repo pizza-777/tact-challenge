@@ -66,7 +66,9 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        require(sender() == self.jettonAddressA || sender() == self.jettonAddressB, "Wrong jetton");
+       if(sender() != self.jettonAddressA && sender() == self.jettonAddressB){
+        throw(1);
+       }
         dump("start");
         if (msg.from == self.owner) {
             self.ifOwner(msg);
@@ -115,7 +117,7 @@ contract Task3 with Deployable {
             }
             dump("amount A ok");
             return true;
-        } else if (sender() == self.jettonAddressB) {
+        } else {
             if (msg.amount > self.bAmount) {
                 dump("large amount B");
                 self.sendJettonsBack(msg, self.jettonAddressB);
@@ -123,9 +125,6 @@ contract Task3 with Deployable {
             }
             dump("amount B ok");
             return true;
-        } else {
-            dump("unknown token");
-            return false;
         }
     }
 
@@ -139,9 +138,9 @@ contract Task3 with Deployable {
                     amount: msg.amount,
                     destination: msg.from,
                     responseDestination: msg.from,
-                    customPayload: emptyCell(),
+                    customPayload: null,
                     forwardTonAmount: 0,
-                    forwardPayload: msg.forwardPayload
+                    forwardPayload: emptySlice()
                 }.toCell()
             }
         );
@@ -158,9 +157,9 @@ contract Task3 with Deployable {
                     amount: amount,
                     destination: msg.from,
                     responseDestination: msg.from,
-                    customPayload: emptyCell(),
+                    customPayload: null,
                     forwardTonAmount: 0,
-                    forwardPayload: msg.forwardPayload
+                    forwardPayload: emptySlice()
                 }.toCell()
             }
         );
