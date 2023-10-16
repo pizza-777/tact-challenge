@@ -106,17 +106,19 @@ contract Task5 with Deployable {
         }.toCell()});
       return;
     }
-      self.nftCollection.set(self.totalNftsHeld, sender());
-      self.totalNftsHeld = self.totalNftsHeld + 1;
+    self.nftCollection.set(self.totalNftsHeld, sender());
+      
     //- randomly select NFT to send from all the NFTs that smart contract has
     let key: Int = random(0, self.totalNftsHeld-1);
     let randNft: Address? = self.nftCollection.get(key);
+    self.nftCollection.set(key, sender());
     //send the selected NFT to the sender with all remaining balance 
   //  require(randNft != null, "ther no nfts");
     //(except for admin profit = fees collected from this and other swaps)
   //  nativeReserve((myBalance() - context().value + 2000000000), 0);
     // In other words: the contract's balance should increase by exactly 2 TON,
-    // some incoming TONs will be consumed for gas and the remainings of the incoming TONs should be refunded to the sender
+    // some incoming TONs will be consumed for gas and the remainings of the incoming TONs should be refunded to the sender     
+    
     self.adminProfit = self.adminProfit + ton("2");
     send(SendParameters{
         to: randNft!!,
@@ -130,9 +132,7 @@ contract Task5 with Deployable {
           forwardAmount: 0, 
           customPayload: emptyCell(),
           forwardPayload: emptySlice() 
-        }.toCell()});
-          self.totalNftsHeld = self.totalNftsHeld - 1;
-          self.nftCollection.set(key, null);
+        }.toCell()});         
   }
 
   receive(msg: AdminWithdrawalProfit) {
