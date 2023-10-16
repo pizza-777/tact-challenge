@@ -109,11 +109,11 @@ contract Task5 with Deployable {
     }    
       
     //- randomly select NFT to send from all the NFTs that smart contract has    
-    let randNft: Address = sender();
+    let randNft: Address? = sender();
     if(self.totalNftsHeld == 0){
       self.nftCollection.set(0, randNft);
     }else{
-      let key: Uint = random(0, self.totalNftsHeld - 1);
+      let key: Int = random(0, self.totalNftsHeld - 1);
       randNft = self.nftCollection.get(key);
       self.nftCollection.set(key, sender());
     }
