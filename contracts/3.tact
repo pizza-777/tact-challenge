@@ -66,7 +66,7 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        nativeReserve(0, 2);
+       // nativeReserve(0, 2);
        if(sender() != self.jettonAddressA && sender() != self.jettonAddressB){
         throw(1);
        }
@@ -83,6 +83,9 @@ contract Task3 with Deployable {
         if (sender() == self.jettonAddressA) {
             dump("jettonA received");
             let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
+            if(amount == 0){
+                return;
+            }
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;
             self.swapJettons(msg, self.jettonAddressB, amount);
@@ -90,6 +93,9 @@ contract Task3 with Deployable {
         if (sender() == self.jettonAddressB) {
             dump("jettonB received");
             let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
+            if(amount == 0){
+                return;
+            }
             self.aAmount = self.aAmount - amount;
             self.bAmount = self.bAmount + msg.amount;
             self.swapJettons(msg, self.jettonAddressA, amount);
@@ -132,9 +138,9 @@ contract Task3 with Deployable {
      fun sendJettonsBack(msg: TokenNotification, to: Address) {
         dump("send transaction back");
         send(SendParameters{to: to,
-                value: 0,
+                value: 100000000,
                 bounce: false,
-                mode: SendRemainingBalance,
+                mode: SendIgnoreErrors,
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: msg.amount,
                     destination: msg.from,
@@ -151,9 +157,9 @@ contract Task3 with Deployable {
         dump("send swap");
         dump(amount);
         send(SendParameters{to: to,
-                value: 0,
+                value: 100000000,
                 bounce: false,
-                mode: SendRemainingBalance,
+                mode: SendIgnoreErrors,
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: amount,
                     destination: msg.from,
