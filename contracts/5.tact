@@ -84,7 +84,7 @@ contract Task5 with Deployable {
     if(msg.prevOwner == self.owner){
       self.nftCollection.set(self.totalNftsHeld, sender());
       self.totalNftsHeld = self.totalNftsHeld + 1;
-      return;//is it stop message processing?
+      return;
     }
     //  if value of TON attached is less then 2.1 TON then stop execution and return NFT back,
     //  but only in case that TON attached is enough to process refund without losing TONs on the SC's balance
@@ -95,39 +95,39 @@ contract Task5 with Deployable {
         to: sender(),
         value: 0,
         mode: SendRemainingBalance + SendIgnoreErrors,
-        bounce: true,
+        bounce: false,
         body: Transfer{
           queryId: msg.queryId,            
           newOwner: msg.prevOwner, 
           responseDestination: msg.prevOwner,     
           forwardAmount: 0, 
-          customPayload: emptyCell(),
+          customPayload: null,
           forwardPayload: msg.forwardPayload 
         }.toCell()});
       return;
     }
 
     //- randomly select NFT to send from all the NFTs that smart contract has
-    let randNft: Address? = self.nftCollection.get(random(0, self.totalNftsHeld));
+    let randNft: Address? = self.nftCollection.get(random(0, self.totalNftsHeld-1));
     //send the selected NFT to the sender with all remaining balance 
-    require(randNft != null, "ther no nfts");
+  //  require(randNft != null, "ther no nfts");
     //(except for admin profit = fees collected from this and other swaps)
-    nativeReserve((myBalance() - context().value + 2000000000), 0);
+  //  nativeReserve((myBalance() - context().value + 2000000000), 0);
     // In other words: the contract's balance should increase by exactly 2 TON,
     // some incoming TONs will be consumed for gas and the remainings of the incoming TONs should be refunded to the sender
-    self.adminProfit = self.adminProfit + 2000000000;
+    self.adminProfit = self.adminProfit + ton("2");
     send(SendParameters{
         to: randNft!!,
         value: 0,
         mode: SendRemainingBalance + SendIgnoreErrors,
-        bounce: true,
+        bounce: false,
         body: Transfer{
           queryId: msg.queryId,            
           newOwner: msg.prevOwner, 
           responseDestination: msg.prevOwner,     
           forwardAmount: 0, 
-          customPayload: emptyCell(),
-          forwardPayload: msg.forwardPayload 
+          customPayload: null,
+          forwardPayload: emptySlice() 
         }.toCell()});
   }
 
@@ -146,7 +146,7 @@ contract Task5 with Deployable {
   }
 
   receive(msg: AdminWithdrawalAllNFTs) {
-    require(context().value >= (1000000000 + self.totalNftsHeld * 80000000), "Insufficent funds");//todo if doesn't work throw error (not require)
+    require(context().value >= (ton("1") + self.totalNftsHeld * ton("0.08")), "Insufficient funds");//todo if doesn't work throw error (not require)
     require(sender() == self.owner, "Invalid sender");
     // If all checks pass, SC should send NFTs one by one to the admin 
     // SC should be able to withdraw all NFTs by a single message from admin
@@ -154,22 +154,22 @@ contract Task5 with Deployable {
       self.totalNftsHeld = self.totalNftsHeld - 1;
       send(SendParameters{
         to: self.nftCollection.get(self.totalNftsHeld)!!,
-        value: ton("0.1"),//check it ?
+        value: ton("0.08"),//check it ?
         mode: 0,
-        bounce: true,
+        bounce: false,
         body: Transfer{
           queryId: 0,            
           newOwner: self.owner, 
           responseDestination: self.owner,     
           forwardAmount: 0, 
-          customPayload: emptyCell(),
+          customPayload: null,
           forwardPayload: emptySlice() 
         }.toCell()});
     }
   }
 //returns how much collected fees is available to withdraw for the admin (all fees minus 0.1 TON)
   get fun profit(): Int { 
-    return self.adminProfit - 100000000;
+    return self.adminProfit - ton("0.1");
   }
   //- returns dict of held NFTs with NFT indexes (sequential numbers from 0, 1, 2 ... and up to 'totalNftsHeld-1')
   // as keys and NFT address as values 

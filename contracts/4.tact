@@ -104,7 +104,7 @@ contract Task4 with Deployable {
                       responseDestination: self.owner!!,    
                       forwardAmount: 0,
                       customPayload: null,
-                      forwardPayload: emptyCell().asSlice()    
+                      forwardPayload: emptySlice()     
                     }.toCell()
                 }
             );
