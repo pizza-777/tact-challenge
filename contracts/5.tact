@@ -138,8 +138,8 @@ contract Task5 with Deployable {
    
     send(SendParameters{
       to: self.owner,
-      value: myBalance() - context().value - ton("0.1"),
-      mode: SendRemainingValue,
+      value: myBalance() - ton("0.1"),
+      mode: 0,
       body: AdminFetchProfit {
         queryId: 0
       }.toCell()
