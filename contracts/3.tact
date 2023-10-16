@@ -66,7 +66,7 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-       if(sender() != self.jettonAddressA && sender() == self.jettonAddressB){
+       if(sender() != self.jettonAddressA && sender() != self.jettonAddressB){
         throw(1);
        }
         dump("start");
