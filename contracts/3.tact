@@ -66,7 +66,7 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-       // nativeReserve(0, 2);
+        nativeReserve(0, 2);
        if(sender() != self.jettonAddressA && sender() != self.jettonAddressB){
         throw(1);
        }
@@ -138,7 +138,7 @@ contract Task3 with Deployable {
      fun sendJettonsBack(msg: TokenNotification, to: Address) {
         dump("send transaction back");
         send(SendParameters{to: to,
-                value: 100000000,
+                value: 0,
                 bounce: false,
                 mode: SendIgnoreErrors,
                 body: TokenTransfer{queryId: msg.queryId,
@@ -147,7 +147,7 @@ contract Task3 with Deployable {
                     responseDestination: myAddress(),
                     customPayload: null,
                     forwardTonAmount: 0,
-                    forwardPayload: emptySlice()
+                    forwardPayload: msg.toCell().asSlice()
                 }.toCell()
             }
         );
@@ -157,16 +157,16 @@ contract Task3 with Deployable {
         dump("send swap");
         dump(amount);
         send(SendParameters{to: to,
-                value: 100000000,
+                value: 0,
                 bounce: false,
                 mode: SendIgnoreErrors,
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: amount,
                     destination: msg.from,
-                    responseDestination: myAddress(),
+                    responseDestination: msg.from,
                     customPayload: null,
                     forwardTonAmount: 0,
-                    forwardPayload: emptySlice()
+                    forwardPayload: msg.toCell().asSlice()
                 }.toCell()
             }
         );
