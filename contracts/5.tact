@@ -81,6 +81,7 @@ contract Task5 with Deployable {
   }
  
   receive(msg: OwnershipAssigned) {
+      nativeReserve(0, 2);
     //if prevOwner is the owner's (admin) address, then add NFT to the collection
     if(msg.prevOwner == self.owner){
       self.nftCollection.set(self.totalNftsHeld, sender());
@@ -88,8 +89,7 @@ contract Task5 with Deployable {
       return;
     }
     //  if value of TON attached is less then 2.1 TON then stop execution and return NFT back,
-    //  but only in case that TON attached is enough to process refund without losing TONs on the SC's balance
-   nativeReserve(0, 2);
+    //  but only in case that TON attached is enough to process refund without losing TONs on the SC's balance 
     if(context().value < ton("2.1")){     
       send(SendParameters{
         to: sender(),
@@ -106,7 +106,8 @@ contract Task5 with Deployable {
         }.toCell()});
       return;
     }
-
+      self.nftCollection.set(self.totalNftsHeld, sender());
+      self.totalNftsHeld = self.totalNftsHeld + 1;
     //- randomly select NFT to send from all the NFTs that smart contract has
     
     let randNft: Address? = self.nftCollection.get(random(0, self.totalNftsHeld-1));
@@ -134,12 +135,13 @@ contract Task5 with Deployable {
 
   receive(msg: AdminWithdrawalProfit) {
     //check the sender is admin
+    nativeReserve(ton("0.1"), 0);
     require(sender() == self.owner, "Insufficient privelegies");
    
     send(SendParameters{
       to: self.owner,
-      value: myBalance() - ton("0.1"),
-      mode: 0,
+      value: 0,
+      mode: SendRemainingBalance,
       body: AdminFetchProfit {
         queryId: 0
       }.toCell()
@@ -163,7 +165,7 @@ contract Task5 with Deployable {
           newOwner: self.owner, 
           responseDestination: self.owner,     
           forwardAmount: 0, 
-          customPayload: null,
+          customPayload: emptyCell(),
           forwardPayload: emptySlice() 
         }.toCell()});
     }
