@@ -116,6 +116,9 @@ contract Task3 with Deployable {
     }
 
      fun checkAmount(msg: TokenNotification): Bool {
+        if(msg.amount == 0){
+            return false;
+        }
         if (sender() == self.jettonAddressA) {
             if (msg.amount > self.aAmount) {
                 dump("large amount A");
@@ -140,7 +143,7 @@ contract Task3 with Deployable {
         send(SendParameters{to: to,
                 value: 0,
                 bounce: false,
-                mode: SendIgnoreErrors,
+                mode: SendRemainingBalance,
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: msg.amount,
                     destination: msg.from,
@@ -159,7 +162,7 @@ contract Task3 with Deployable {
         send(SendParameters{to: to,
                 value: 0,
                 bounce: false,
-                mode: SendIgnoreErrors,
+                mode: SendRemainingBalance,
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: amount,
                     destination: msg.from,
