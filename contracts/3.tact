@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -65,86 +66,103 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        if (msg.from != self.owner) {
-            if (sender() == self.jettonAddressA) {
-                let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
-                self.bAmount = self.bAmount - amount;
-                send(SendParameters{to: self.jettonAddressB,
-                        value: 0,
-                        bounce: true,
-                        mode: SendIgnoreErrors + SendRemainingValue,
-                        body: TokenTransfer{queryId: msg.queryId,
-                            amount: amount,
-                            destination: msg.from,
-                            responseDestination: msg.from,
-                            customPayload: emptyCell(),
-                            forwardTonAmount: 0,
-                            forwardPayload: msg.forwardPayload
-                        }.toCell()
-                    }
-                );
-                return;
-            }
-            if (sender() == self.jettonAddressB) {
-                let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
-                self.aAmount = self.aAmount - amount;
-                send(SendParameters{to: self.jettonAddressA,
-                        value: 0,
-                        bounce: true,
-                        mode: SendIgnoreErrors + SendRemainingValue,
-                        body: TokenTransfer{queryId: msg.queryId,
-                            amount: amount,
-                            destination: msg.from,
-                            responseDestination: msg.from,
-                            customPayload: emptyCell(),
-                            forwardTonAmount: 0,
-                            forwardPayload: msg.forwardPayload
-                        }.toCell()
-                    }
-                );
-            }
-        }
+        //dump("start");
         if (msg.from == self.owner) {
-            if (sender() == self.jettonAddressA) {
-                self.aAmount = self.aAmount + msg.amount;
-            } else {
-                self.bAmount = self.bAmount + msg.amount;
-            }
+            self.ifOwner(msg);
             return ;
         }
+        if (self.checkAmount(msg) == false) {
+            //dump("stop processing, large amount");
+            return ;
+        }
+        //dump("not owner");
         if (sender() == self.jettonAddressA) {
-            if (msg.amount > self.aAmount) {
-                return ;
-            }
-        } else if (sender() == self.jettonAddressA) {
-            if (msg.amount > self.bAmount) {
-                return ;
-            }
-        } else {
-            throw(1); //unknown token
+            //dump("jettonA received");
+            let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
+            self.bAmount = self.bAmount - amount;
+            self.aAmount = self.aAmount + msg.amount;
+            self.swapJettons(msg, self.jettonAddressB, amount);
+        }
+        if (sender() == self.jettonAddressB) {
+            //dump("jettonB received");
+            let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
+            self.aAmount = self.aAmount - amount;
+            self.bAmount = self.bAmount + msg.amount;
+            self.swapJettons(msg, self.jettonAddressA, amount);
         }
     }
 
-    //     fun transferJetton(msg: TokenNotification){
-    //         send(SendParameters{
-    //             to: to,
-    //             value: value,
-    //             bounce: true,
-    //             mode: SendIgnoreErrors + SendRemainingValue,
-    //             body: TokenTransfer {
-    //     queryId: queryId,
-    //     amount: amount,
-    //     destination: destination
-    //     responseDestination: Address?;
-    //     customPayload: Cell?;
-    //     forwardTonAmount: Int as coins;
-    //     forwardPayload: Slice as remaining;
-    // }
-    //         })
-    //     }
+     fun ifOwner(msg: TokenNotification) {
+        //dump("owner");
+        if (sender() == self.jettonAddressA) {
+            //dump("owner and jettonA");
+            self.aAmount = self.aAmount + msg.amount;
+            //dump(self.aAmount);
+        } else {
+            //dump("owner and jettonB");
+            self.bAmount = self.bAmount + msg.amount;
+            //dump(self.aAmount);
+        }
+    }
 
-    get fun jetton(): Address {
-        return self.jetton!!;
+     fun checkAmount(msg: TokenNotification): Bool {
+        if (sender() == self.jettonAddressA) {
+            if (msg.amount > self.aAmount) {
+                //dump("large amount A");
+                self.sendJettonsBack(msg, self.jettonAddressA);
+                return false;
+            }
+            //dump("amount A ok");
+            return true;
+        } else if (sender() == self.jettonAddressB) {
+            if (msg.amount > self.bAmount) {
+                //dump("large amount B");
+                self.sendJettonsBack(msg, self.jettonAddressB);
+                return false;
+            }
+            //dump("amount B ok");
+            return true;
+        } else {
+            //dump("unknown token");
+            return false;
+        }
+    }
+
+     fun sendJettonsBack(msg: TokenNotification, to: Address) {
+        //dump("send transaction back");
+        send(SendParameters{to: to,
+                value: 0,
+                bounce: false,
+                mode: SendIgnoreErrors + SendRemainingValue,
+                body: TokenTransfer{queryId: msg.queryId,
+                    amount: msg.amount,
+                    destination: msg.from,
+                    responseDestination: msg.from,
+                    customPayload: emptyCell(),
+                    forwardTonAmount: 0,
+                    forwardPayload: msg.forwardPayload
+                }.toCell()
+            }
+        );
+    }
+
+     fun swapJettons(msg: TokenNotification, to: Address, amount: Int) {
+        //dump("send swap");
+        //dump(amount);
+        send(SendParameters{to: to,
+                value: 0,
+                bounce: false,
+                mode: SendIgnoreErrors + SendRemainingValue,
+                body: TokenTransfer{queryId: msg.queryId,
+                    amount: amount,
+                    destination: msg.from,
+                    responseDestination: msg.from,
+                    customPayload: emptyCell(),
+                    forwardTonAmount: 0,
+                    forwardPayload: msg.forwardPayload
+                }.toCell()
+            }
+        );
     }
 
     // Price for the jetton A in swap B->A should be calculated by formula "amountOfJettonAOnContract * decimal / amountOfJettonBOnContract".
@@ -152,6 +170,9 @@ contract Task3 with Deployable {
     // Decimals are only needed for price accuracy. It should be set as 1e9.
     // So, if smart contract has 10 of jetton A and 2 of jetton B, then after sending 1 jetton B you should receive 5 of jettons A.
     get fun price(jetton: Address): Int {
+        if (self.aAmount == 0 || self.bAmount == 0) {
+            return 0;
+        }
         if (jetton == self.jettonAddressA) {
             return self.aAmount * self.decimal / self.bAmount;
         }
