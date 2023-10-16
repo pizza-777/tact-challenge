@@ -56,17 +56,17 @@ contract Task4 with Deployable {
         if (self.nft != null) { //if nft already holded - return nft back to the sender (nft contract)
             //return back nft
             send(SendParameters{
-                    to: sender(),//is it self.nft item address?
+                    to: sender(),
                     value: 0,
                     mode: SendRemainingValue,
-                    bounce: true,
+                    bounce: false,
                     body: Transfer{
                       queryId: msg.queryId,
                       newOwner: msg.prevOwner,
                       responseDestination: msg.prevOwner,    
                       forwardAmount: 0,
-                      forwardPayload: msg.forwardPayload,//? should I need to change prevOwner? No
-                      customPayload: null 
+                      forwardPayload: emptySlice(),//? should I need to change prevOwner? No
+                      customPayload: emptyCell() 
                     }.toCell()
                 }
             );
@@ -97,25 +97,25 @@ contract Task4 with Deployable {
                   to: self.nft!!,
                   value: 0,
                   mode: SendRemainingValue,
-                  bounce: true,
+                  bounce: false,
                   body: Transfer{
                       queryId: msg.queryId,                      
                       newOwner: self.owner!!,
                       responseDestination: self.owner!!,    
                       forwardAmount: 0,
-                      customPayload: null,
+                      customPayload: emptyCell(),
                       forwardPayload: emptySlice()     
                     }.toCell()
                 }
             );
             self.nft = null;
             self.owner = null;
-            self.lockedTime = 0;
+            self.lockedTime = now();
         }
     }
 
     get fun time(): Int {      
-        return self.lockedTime - now();    //correct. So its time before in timestamp seconds  
+        return self.lockedTime ;    //correct. So its time before in timestamp seconds  
     }
 
     get fun nft(): Address? {
