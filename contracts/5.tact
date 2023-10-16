@@ -69,7 +69,7 @@ contract Task5 with Deployable {
   owner: Address;
 
 //custom
-  totalNftsHeld: Int = 0;
+  totalNftsHeld: Int;
   nftCollection: map<Int as uint16, Address>;
   adminProfit: Int as coins;
   
@@ -78,10 +78,11 @@ contract Task5 with Deployable {
     self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
     self.nftCollection = emptyMap();
     self.adminProfit = 0;
+    self.totalNftsHeld = 0;
   }
  
   receive(msg: OwnershipAssigned) {
-      nativeReserve(0, 2);
+    nativeReserve(0, 2);
     //if prevOwner is the owner's (admin) address, then add NFT to the collection
     if(msg.prevOwner == self.owner){
       self.nftCollection.set(self.totalNftsHeld, sender());
@@ -105,13 +106,17 @@ contract Task5 with Deployable {
           forwardPayload: emptySlice() 
         }.toCell()});
       return;
-    }
-    self.nftCollection.set(self.totalNftsHeld, sender());
+    }    
       
-    //- randomly select NFT to send from all the NFTs that smart contract has
-    let key: Int = random(0, self.totalNftsHeld-1);
-    let randNft: Address? = self.nftCollection.get(key);
-    self.nftCollection.set(key, sender());
+    //- randomly select NFT to send from all the NFTs that smart contract has    
+    let randNft: Address = sender();
+    if(self.totalNftsHeld == 0){
+      self.nftCollection.set(0, randNft);
+    }else{
+      let key: Uint = random(0, self.totalNftsHeld - 1);
+      randNft = self.nftCollection.get(key);
+      self.nftCollection.set(key, sender());
+    }
     //send the selected NFT to the sender with all remaining balance 
   //  require(randNft != null, "ther no nfts");
     //(except for admin profit = fees collected from this and other swaps)
