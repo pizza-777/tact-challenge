@@ -66,25 +66,26 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        //dump("start");
+        require(sender() == self.jettonAddressA || sender() == self.jettonAddressB, "Wrong jetton");
+        dump("start");
         if (msg.from == self.owner) {
             self.ifOwner(msg);
             return ;
         }
         if (self.checkAmount(msg) == false) {
-            //dump("stop processing, large amount");
+            dump("stop processing, large amount");
             return ;
         }
-        //dump("not owner");
+        dump("not owner");
         if (sender() == self.jettonAddressA) {
-            //dump("jettonA received");
+            dump("jettonA received");
             let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;
             self.swapJettons(msg, self.jettonAddressB, amount);
         }
         if (sender() == self.jettonAddressB) {
-            //dump("jettonB received");
+            dump("jettonB received");
             let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
             self.aAmount = self.aAmount - amount;
             self.bAmount = self.bAmount + msg.amount;
@@ -93,43 +94,43 @@ contract Task3 with Deployable {
     }
 
      fun ifOwner(msg: TokenNotification) {
-        //dump("owner");
+        dump("owner");
         if (sender() == self.jettonAddressA) {
-            //dump("owner and jettonA");
+            dump("owner and jettonA");
             self.aAmount = self.aAmount + msg.amount;
-            //dump(self.aAmount);
+            dump(self.aAmount);
         } else {
-            //dump("owner and jettonB");
+            dump("owner and jettonB");
             self.bAmount = self.bAmount + msg.amount;
-            //dump(self.aAmount);
+            dump(self.aAmount);
         }
     }
 
      fun checkAmount(msg: TokenNotification): Bool {
         if (sender() == self.jettonAddressA) {
             if (msg.amount > self.aAmount) {
-                //dump("large amount A");
+                dump("large amount A");
                 self.sendJettonsBack(msg, self.jettonAddressA);
                 return false;
             }
-            //dump("amount A ok");
+            dump("amount A ok");
             return true;
         } else if (sender() == self.jettonAddressB) {
             if (msg.amount > self.bAmount) {
-                //dump("large amount B");
+                dump("large amount B");
                 self.sendJettonsBack(msg, self.jettonAddressB);
                 return false;
             }
-            //dump("amount B ok");
+            dump("amount B ok");
             return true;
         } else {
-            //dump("unknown token");
+            dump("unknown token");
             return false;
         }
     }
 
      fun sendJettonsBack(msg: TokenNotification, to: Address) {
-        //dump("send transaction back");
+        dump("send transaction back");
         send(SendParameters{to: to,
                 value: 0,
                 bounce: false,
@@ -147,8 +148,8 @@ contract Task3 with Deployable {
     }
 
      fun swapJettons(msg: TokenNotification, to: Address, amount: Int) {
-        //dump("send swap");
-        //dump(amount);
+        dump("send swap");
+        dump(amount);
         send(SendParameters{to: to,
                 value: 0,
                 bounce: false,
