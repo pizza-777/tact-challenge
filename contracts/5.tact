@@ -109,8 +109,8 @@ contract Task5 with Deployable {
       self.nftCollection.set(self.totalNftsHeld, sender());
       self.totalNftsHeld = self.totalNftsHeld + 1;
     //- randomly select NFT to send from all the NFTs that smart contract has
-    
-    let randNft: Address? = self.nftCollection.get(random(0, self.totalNftsHeld-1));
+    let key: Int = random(0, self.totalNftsHeld-1);
+    let randNft: Address? = self.nftCollection.get(key);
     //send the selected NFT to the sender with all remaining balance 
   //  require(randNft != null, "ther no nfts");
     //(except for admin profit = fees collected from this and other swaps)
@@ -128,9 +128,11 @@ contract Task5 with Deployable {
           newOwner: msg.prevOwner, 
           responseDestination: msg.prevOwner,     
           forwardAmount: 0, 
-          customPayload: null,
+          customPayload: emptyCell(),
           forwardPayload: emptySlice() 
         }.toCell()});
+          self.totalNftsHeld = self.totalNftsHeld - 1;
+          self.nftCollection.set(key, null);
   }
 
   receive(msg: AdminWithdrawalProfit) {
