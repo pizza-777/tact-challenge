@@ -68,22 +68,17 @@ contract Task3 with Deployable {
     receive(msg: TokenNotification){
       //  nativeReserve(0, 2);
       let  ctx: Context = context();
-       if(ctx.sender != self.jettonAddressA && ctx.sender != self.jettonAddressB){
-        throw(1);
-       }
+      require(ctx.sender != self.jettonAddressA && ctx.sender != self.jettonAddressB, "Wrong sender");
+      require(msg.amount > 0, "Jetton amount is 0");
         //dump("start");
-        if (msg.from == self.owner) {
-            self.ifOwner(msg, ctx);
-           
-        }else
-        if (self.checkAmount(msg, ctx) == false) {
-            //dump("stop processing, large amount");
-            
-        }else
+        if (msg.from == self.owner) {            
+            self.ifOwner(msg, ctx);           
+        }
+      //  require(self.checkAmount(msg, ctx) == true, "Wrong amount");
         //dump("not owner");
         if (ctx.sender == self.jettonAddressA) {
             //dump("jettonA received");
-             let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
+             let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
             if(amount == 0){
                 return;
             }
@@ -93,7 +88,7 @@ contract Task3 with Deployable {
         }else
         if (ctx.sender == self.jettonAddressB) {
            //dump("jettonB received");
-            let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
+            let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
             if(amount == 0){
                 return;
             }
@@ -103,8 +98,7 @@ contract Task3 with Deployable {
         }
     }
 
-     fun ifOwner(msg: TokenNotification, ctx: Context) {
-        //dump("owner");
+     fun ifOwner(msg: TokenNotification, ctx: Context) {      
         if (ctx.sender == self.jettonAddressA) {
             //dump("owner and jettonA");
             self.aAmount = self.aAmount + msg.amount;
@@ -116,10 +110,7 @@ contract Task3 with Deployable {
         }
     }
 
-     fun checkAmount(msg: TokenNotification, ctx: Context): Bool {
-        if(msg.amount == 0){
-            return false;
-        }
+     fun checkAmount(msg: TokenNotification, ctx: Context): Bool {       
         if (ctx.sender == self.jettonAddressA) {
             if (msg.amount > self.aAmount) {
                 //dump("large amount A");
@@ -145,7 +136,7 @@ contract Task3 with Deployable {
         send(SendParameters{to: to,
                 value: ton("0.1"),
                 bounce: true,
-                mode: SendIgnoreErrors,
+                mode: 0,
                 body: TokenTransfer{queryId: 0,
                     amount: amount,
                     destination: msg.from,
