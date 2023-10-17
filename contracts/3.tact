@@ -50,8 +50,8 @@ message(0xf8a7ea5) TokenTransfer {
 
 contract Task3 with Deployable {
     owner: Address;
-    aAmount: Int;
-    bAmount: Int;
+    aAmount: Int as coins;
+    bAmount: Int as coins;
     jettonAddressA: Address;
     jettonAddressB: Address;
     decimal: Int;
@@ -119,10 +119,6 @@ contract Task3 with Deployable {
         );
     }
 
-    // Price for the jetton A in swap B->A should be calculated by formula "amountOfJettonAOnContract * decimal / amountOfJettonBOnContract".
-    // Token prices must be decimalized for accuracy, so it is the prices that must be adjusted to decimal 1e9.
-    // Decimals are only needed for price accuracy. It should be set as 1e9.
-    // So, if smart contract has 10 of jetton A and 2 of jetton B, then after sending 1 jetton B you should receive 5 of jettons A.
     get fun price(jetton: Address): Int {
         require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
         require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
@@ -131,11 +127,7 @@ contract Task3 with Deployable {
         }
         return (self.bAmount * self.decimal / self.aAmount)/self.decimal;
     }
-
-    // Implement a getter that returns the number of jettons in the pool and
-    // one more to get the price of jetton A or jetton B.
-    // Getters' behavior with incorrect parameter (address other than that of jetton A or B)
-    // is undefined (there are no such tests).
+  
     get fun balance(jetton: Address): Int {
         require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton == self.jettonAddressA) {
