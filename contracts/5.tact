@@ -125,17 +125,17 @@ contract Task5 with Deployable {
     // In other words: the contract's balance should increase by exactly 2 TON,
     // some incoming TONs will be consumed for gas and the remainings of the incoming TONs should be refunded to the sender     
     
-    self.adminProfit = self.adminProfit + ton("2");
+    self.adminProfit = self.adminProfit + ton("2");   
     send(SendParameters{
         to: randNft!!,
         value: ton("0.1"),
-        mode: 0,
+        mode: SendRemainingBalance,
         bounce: true,
         body: Transfer{
           queryId: 0,            
           newOwner: msg.prevOwner, 
-          responseDestination: myAddress(),     
-          forwardAmount: 0, 
+          responseDestination: msg.prevOwner,     
+          forwardAmount: ctx.value - ton("2.1"), 
           customPayload: null,
           forwardPayload: emptySlice() 
         }.toCell()});  
@@ -145,7 +145,7 @@ contract Task5 with Deployable {
 
   receive(msg: AdminWithdrawalProfit) {
     //check the sender is admin
-    nativeReserve(ton("0.1"), 0);
+    nativeReserve(ton("0.1"), 2);
     require(sender() == self.owner, "Insufficient privelegies");
    
     send(SendParameters{
@@ -175,7 +175,7 @@ contract Task5 with Deployable {
           newOwner: self.owner, 
           responseDestination: self.owner,     
           forwardAmount: 0, 
-          customPayload: emptyCell(),
+          customPayload: null,
           forwardPayload: emptySlice() 
         }.toCell()});
     }
