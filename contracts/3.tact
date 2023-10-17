@@ -184,9 +184,9 @@ contract Task3 with Deployable {
             return 0;
         }
         if (jetton == self.jettonAddressA) {
-            return self.aAmount * self.decimal / self.bAmount;
+            return (self.aAmount * self.decimal / self.bAmount)/self.decimal;
         }
-        return self.bAmount * self.decimal / self.aAmount;
+        return (self.bAmount * self.decimal / self.aAmount)/self.decimal;
     }
 
     // Implement a getter that returns the number of jettons in the pool and
