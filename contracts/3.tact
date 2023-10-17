@@ -76,10 +76,10 @@ contract Task3 with Deployable {
             self.ifOwner(msg, ctx);
            
         }else
-        if (self.checkAmount(msg, ctx) == false) {
-            //dump("stop processing, large amount");
+        // if (self.checkAmount(msg, ctx) == false) {
+        //     //dump("stop processing, large amount");
             
-        }else
+        // }else
         ////dump("not owner");
         if (ctx.sender == self.jettonAddressA) {
             //dump("jettonA received");
