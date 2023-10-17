@@ -66,7 +66,7 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        nativeReserve(0, 2);
+      //  nativeReserve(0, 2);
        if(sender() != self.jettonAddressA && sender() != self.jettonAddressB){
         throw(1);
        }
@@ -141,9 +141,9 @@ contract Task3 with Deployable {
      fun sendJettonsBack(msg: TokenNotification, to: Address) {
         dump("send transaction back");
         send(SendParameters{to: to,
-                value: 0,
+                value: ton("0.1"),
                 bounce: false,
-                mode: SendRemainingBalance,
+                mode: 0,
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: msg.amount,
                     destination: msg.from,
@@ -160,7 +160,7 @@ contract Task3 with Deployable {
         dump("send swap");
         dump(amount);
         send(SendParameters{to: to,
-                value: 0,
+                value: ton("0.1"),
                 bounce: false,
                 mode: SendRemainingBalance,
                 body: TokenTransfer{queryId: msg.queryId,
