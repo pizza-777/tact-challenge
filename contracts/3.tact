@@ -77,7 +77,7 @@ contract Task3 with Deployable {
              }
             //dump("jettonA received");
             let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
-            if(amount >= self.bAmount){
+            if(amount > self.bAmount){
                 self.sendJettons(msg, self.jettonAddressA, msg.amount);
                 return;
             }
@@ -91,7 +91,7 @@ contract Task3 with Deployable {
              }
            //dump("jettonB received");
             let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
-            if(amount >= self.aAmount){
+            if(amount > self.aAmount){
                 self.sendJettons(msg, self.jettonAddressB, msg.amount);
                 return;
             }
@@ -105,7 +105,7 @@ contract Task3 with Deployable {
         //dump(amount);
         send(SendParameters{to: to,
                 value: ton("0.1"),
-                bounce: true,
+                bounce: false,
                 mode: 0,
                 body: TokenTransfer{queryId: 0,
                     amount: amount,
