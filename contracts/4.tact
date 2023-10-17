@@ -83,12 +83,7 @@ contract Task4 with Deployable {
         require(ctx.sender != self.owner, "Invalid sender");
         require(self.lockedTime > 0, "Locked time not set");
         if (self.lockedTime > now()) {
-            send(SendParameters{to: sender(),
-                    value: 0,
-                    mode: SendRemainingValue,
-                    body: "NFT is still locked".asComment() // ? is it according to the TON's "message with text comment" standard ?
-                }
-            );
+            self.reply("NFT is still locked".asComment()); // ? is it according to the TON's "message with text comment" standard ?                    
         } else {
             //what does it "mean send nft?"
             //maybe ownership assigned for new owner
@@ -112,7 +107,7 @@ contract Task4 with Deployable {
             );
             self.nft = null;
             self.owner = null;
-            self.lockedTime = 0;
+            self.lockedTime = now();
         }
     }
 
