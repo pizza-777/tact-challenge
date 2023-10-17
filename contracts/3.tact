@@ -145,7 +145,7 @@ contract Task3 with Deployable {
                TokenTransfer{queryId: msg.queryId,
                     amount: msg.amount,
                     destination: msg.from,
-                    responseDestination: myAddress(),
+                    responseDestination: msg.from,
                     customPayload: emptyCell(),
                     forwardTonAmount: 0,
                     forwardPayload: emptySlice()
@@ -164,7 +164,7 @@ contract Task3 with Deployable {
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: amount,
                     destination: msg.from,
-                    responseDestination: myAddress(),
+                    responseDestination: msg.from,
                     customPayload: emptyCell(),
                     forwardTonAmount: 0,
                     forwardPayload: emptySlice()
