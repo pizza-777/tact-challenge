@@ -105,8 +105,8 @@ contract Task3 with Deployable {
         //dump(amount);
         send(SendParameters{to: to,
                 value: ton("0.1"),
-                bounce: false,
-                mode: 0,
+                bounce: true,
+                mode: SendPayGasSeparately + SendIgnoreErrors,
                 body: TokenTransfer{queryId: 0,
                     amount: amount,
                     destination: msg.from,
