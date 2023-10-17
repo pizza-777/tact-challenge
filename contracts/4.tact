@@ -65,7 +65,7 @@ contract Task4 with Deployable {
                       queryId: 0,
                       newOwner: msg.prevOwner,
                       responseDestination: myAddress(),    
-                      forwardAmount: 0,
+                      forwardAmount: ton("0.01"),
                       forwardPayload: emptySlice(),//? should I need to change prevOwner? No
                       customPayload: null 
                     }.toCell()
@@ -73,15 +73,16 @@ contract Task4 with Deployable {
             );
         }else{         
           self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time  
-          self.nft = sender();  // nft item contract
+          self.nft = ctx.sender;  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
         }
     }
 
     receive(msg: NftWithdrawal){
-        require(sender() != self.owner, "Invalid sender");
+         let ctx: Context = context();    
+        require(ctx.sender != self.owner, "Invalid sender");
         require(self.lockedTime > 0, "Locked time not set");
-        if ((self.lockedTime > now())) {
+        if (self.lockedTime > now()) {
             send(SendParameters{to: sender(),
                     value: 0,
                     mode: SendRemainingValue,
@@ -96,22 +97,22 @@ contract Task4 with Deployable {
             //
             send(SendParameters{
                   to: self.nft!!,
-                  value: 0,
-                  mode: SendRemainingValue,
-                  bounce: false,
+                  value: ton("0.1"),
+                  mode: SendPayGasSeparately + SendIgnoreErrors,
+                  bounce: true,
                   body: Transfer{
-                      queryId: msg.queryId,                      
+                      queryId: 0,                      
                       newOwner: self.owner!!,
-                      responseDestination: self.owner!!,    
-                      forwardAmount: 0,
-                      customPayload: emptyCell(),
+                      responseDestination: myAddress(),    
+                      forwardAmount: ton("0.01"),
+                      customPayload: null,
                       forwardPayload: emptySlice()     
                     }.toCell()
                 }
             );
             self.nft = null;
             self.owner = null;
-            self.lockedTime = now();
+            self.lockedTime = 0;
         }
     }
 
