@@ -1,16 +1,16 @@
 import "@stdlib/deploy";
 message Add {
-  queryId: Int as uint64;
-  number: Int as uint32;
+  queryId: Int as uint8;
+  number: Int as uint8;
 }
 
 message Subtract {
-  queryId: Int as uint64;
-  number: Int as uint32;
+  queryId: Int as uint8;
+  number: Int as uint8;
 }
 
 contract Task1 with Deployable {
-    counter: Int as int32;
+    counter: Int as int8;
 
     init() {
       self.counter = 0;
