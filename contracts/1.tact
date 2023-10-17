@@ -6,11 +6,11 @@ message Add {
 
 message Subtract {
   queryId: Int as uint8;
-  number: Int as uint8;
+  number: Int as uint16;
 }
 
 contract Task1 with Deployable {
-    counter: Int as int8;
+    counter: Int as int16;
 
     init() {
       self.counter = 0;
