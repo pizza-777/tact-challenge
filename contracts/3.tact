@@ -68,28 +68,31 @@ contract Task3 with Deployable {
     receive(msg: TokenNotification){
       //  nativeReserve(0, 2);
       let  ctx: Context = context();
-      require(ctx.sender != self.jettonAddressA && ctx.sender != self.jettonAddressB, "Wrong sender");
-      require(msg.amount > 0, "Jetton amount is 0");
-        //dump("start");
-        if (msg.from == self.owner) {            
-            self.ifOwner(msg, ctx);           
-        }
-      //  require(self.checkAmount(msg, ctx) == true, "Wrong amount");
-        //dump("not owner");
+      require(ctx.sender == self.jettonAddressA || ctx.sender == self.jettonAddressB, "Wrong sender");
+      require(msg.amount > 0, "Jetton amount is 0");      
         if (ctx.sender == self.jettonAddressA) {
+             if (msg.from == self.owner) {  
+                 self.aAmount = self.aAmount + msg.amount;
+                 return;
+             }
             //dump("jettonA received");
-             let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
-            if(amount == 0){
+            let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
+            if(amount > self.bAmount){
+                self.sendJettons(msg, self.jettonAddressA, msg.amount);
                 return;
             }
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;            
             self.sendJettons(msg, self.jettonAddressB, amount);
-        }else
-        if (ctx.sender == self.jettonAddressB) {
+        }else{
+             if (msg.from == self.owner) {  
+                 self.bAmount = self.bAmount + msg.amount;
+                 return;
+             }
            //dump("jettonB received");
             let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
-            if(amount == 0){
+            if(amount > self.aAmount){
+                self.sendJettons(msg, self.jettonAddressB, msg.amount);
                 return;
             }
             self.aAmount = self.aAmount - amount;
@@ -97,39 +100,6 @@ contract Task3 with Deployable {
             self.sendJettons(msg, self.jettonAddressA, amount);
         }
     }
-
-     fun ifOwner(msg: TokenNotification, ctx: Context) {      
-        if (ctx.sender == self.jettonAddressA) {
-            //dump("owner and jettonA");
-            self.aAmount = self.aAmount + msg.amount;
-            //dump(self.aAmount);
-        } else {
-            //dump("owner and jettonB");
-            self.bAmount = self.bAmount + msg.amount;
-            //dump(self.aAmount);
-        }
-    }
-
-     fun checkAmount(msg: TokenNotification, ctx: Context): Bool {       
-        if (ctx.sender == self.jettonAddressA) {
-            if (msg.amount > self.aAmount) {
-                //dump("large amount A");
-                self.sendJettons(msg, self.jettonAddressA, msg.amount);
-                return false;
-            }
-            //dump("amount A ok");
-            return true;
-        } else {
-            if (msg.amount > self.bAmount) {
-                //dump("large amount B");
-                self.sendJettons(msg, self.jettonAddressB, msg.amount);
-                return false;
-            }
-            //dump("amount B ok");
-            return true;
-        }
-    }    
-
      fun sendJettons(msg: TokenNotification, to: Address, amount: Int) {
         //dump("send swap");
         //dump(amount);
@@ -154,9 +124,8 @@ contract Task3 with Deployable {
     // Decimals are only needed for price accuracy. It should be set as 1e9.
     // So, if smart contract has 10 of jetton A and 2 of jetton B, then after sending 1 jetton B you should receive 5 of jettons A.
     get fun price(jetton: Address): Int {
-        if (self.aAmount == 0 || self.bAmount == 0) {
-            return 0;
-        }
+        require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
+        require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton == self.jettonAddressA) {
             return (self.aAmount * self.decimal / self.bAmount)/self.decimal;
         }
@@ -168,6 +137,7 @@ contract Task3 with Deployable {
     // Getters' behavior with incorrect parameter (address other than that of jetton A or B)
     // is undefined (there are no such tests).
     get fun balance(jetton: Address): Int {
+        require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton == self.jettonAddressA) {
             return self.aAmount;
         }
