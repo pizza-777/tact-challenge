@@ -92,7 +92,7 @@ contract Task3 with Deployable {
             self.sendJettons(msg, self.jettonAddressB, amount);
         }else
         if (ctx.sender == self.jettonAddressB) {
-            dump("jettonB received");
+           //dump("jettonB received");
             let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
             if(amount == 0){
                 return;
@@ -143,7 +143,7 @@ contract Task3 with Deployable {
         //dump("send swap");
         //dump(amount);
         send(SendParameters{to: to,
-                value: ton("0.01"),
+                value: ton("0.1"),
                 bounce: true,
                 mode: SendIgnoreErrors,
                 body: TokenTransfer{queryId: 0,
