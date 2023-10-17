@@ -162,7 +162,7 @@ contract Task3 with Deployable {
         send(SendParameters{to: to,
                 value: ton("1"),
                 bounce: false,
-                mode: 0,
+                mode: SendIgnoreErrors,
                 body: TokenTransfer{queryId: msg.queryId,
                     amount: amount,
                     destination: msg.from,
