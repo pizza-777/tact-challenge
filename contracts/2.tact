@@ -1,7 +1,7 @@
 import "@stdlib/deploy";
 
 message(0x44) Refund {
-    queryId: Int as uint16;
+    queryId: Int as uint64;
     sender: Address;
 }
 
