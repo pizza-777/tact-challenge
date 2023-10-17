@@ -89,7 +89,7 @@ contract Task3 with Deployable {
             }
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;            
-            self.swapJettons(msg, self.jettonAddressB, amount);
+            self.sendJettons(msg, self.jettonAddressB, amount);
         }else
         if (ctx.sender == self.jettonAddressB) {
             dump("jettonB received");
@@ -99,7 +99,7 @@ contract Task3 with Deployable {
             }
             self.aAmount = self.aAmount - amount;
             self.bAmount = self.bAmount + msg.amount;              
-            self.swapJettons(msg, self.jettonAddressA, amount);
+            self.sendJettons(msg, self.jettonAddressA, amount);
         }
     }
 
@@ -123,7 +123,7 @@ contract Task3 with Deployable {
         if (ctx.sender == self.jettonAddressA) {
             if (msg.amount > self.aAmount) {
                 //dump("large amount A");
-                self.sendJettonsBack(msg, self.jettonAddressA);
+                self.sendJettons(msg, self.jettonAddressA, msg.amount);
                 return false;
             }
             //dump("amount A ok");
@@ -131,35 +131,20 @@ contract Task3 with Deployable {
         } else {
             if (msg.amount > self.bAmount) {
                 //dump("large amount B");
-                self.sendJettonsBack(msg, self.jettonAddressB);
+                self.sendJettons(msg, self.jettonAddressB, msg.amount);
                 return false;
             }
             //dump("amount B ok");
             return true;
         }
-    }
+    }    
 
-     fun sendJettonsBack(msg: TokenNotification, to: Address) {
-        //dump("send transaction back");
-       self.reply(
-               TokenTransfer{queryId: 0,
-                    amount: msg.amount,
-                    destination: msg.from,
-                    responseDestination: myAddress(),
-                    customPayload: null,
-                    forwardTonAmount: ton("0.01"),
-                    forwardPayload: emptySlice()
-                }.toCell()
-            
-        );
-    }
-
-     fun swapJettons(msg: TokenNotification, to: Address, amount: Int) {
+     fun sendJettons(msg: TokenNotification, to: Address, amount: Int) {
         //dump("send swap");
         //dump(amount);
         send(SendParameters{to: to,
-                value: ton("0.1"),
-                bounce: false,
+                value: ton("0.01"),
+                bounce: true,
                 mode: SendIgnoreErrors,
                 body: TokenTransfer{queryId: 0,
                     amount: amount,
