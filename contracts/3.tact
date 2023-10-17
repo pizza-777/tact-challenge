@@ -76,31 +76,29 @@ contract Task3 with Deployable {
             self.ifOwner(msg, ctx);
            
         }else
-        // if (self.checkAmount(msg, ctx) == false) {
-        //     //dump("stop processing, large amount");
+        if (self.checkAmount(msg, ctx) == false) {
+            //dump("stop processing, large amount");
             
-        // }else
-        ////dump("not owner");
+        }else
+        //dump("not owner");
         if (ctx.sender == self.jettonAddressA) {
             //dump("jettonA received");
-            // let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
-            // if(amount == 0){
-            //     return;
-            // }
-            // self.bAmount = self.bAmount - amount;
-            // self.aAmount = self.aAmount + msg.amount;
-            let amount: Int = ton("1");
+             let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
+            if(amount == 0){
+                return;
+            }
+            self.bAmount = self.bAmount - amount;
+            self.aAmount = self.aAmount + msg.amount;            
             self.swapJettons(msg, self.jettonAddressB, amount);
         }else
         if (ctx.sender == self.jettonAddressB) {
-            //dump("jettonB received");
-            // let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
-            // if(amount == 0){
-            //     return;
-            // }
-            // self.aAmount = self.aAmount - amount;
-            // self.bAmount = self.bAmount + msg.amount;
-              let amount: Int = ton("1");
+            dump("jettonB received");
+            let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
+            if(amount == 0){
+                return;
+            }
+            self.aAmount = self.aAmount - amount;
+            self.bAmount = self.bAmount + msg.amount;              
             self.swapJettons(msg, self.jettonAddressA, amount);
         }
     }
@@ -144,12 +142,12 @@ contract Task3 with Deployable {
      fun sendJettonsBack(msg: TokenNotification, to: Address) {
         //dump("send transaction back");
        self.reply(
-               TokenTransfer{queryId: msg.queryId,
+               TokenTransfer{queryId: 0,
                     amount: msg.amount,
                     destination: msg.from,
-                    responseDestination: msg.from,
-                    customPayload: emptyCell(),
-                    forwardTonAmount: 0,
+                    responseDestination: myAddress(),
+                    customPayload: null,
+                    forwardTonAmount: ton("0.01"),
                     forwardPayload: emptySlice()
                 }.toCell()
             
@@ -160,15 +158,15 @@ contract Task3 with Deployable {
         //dump("send swap");
         //dump(amount);
         send(SendParameters{to: to,
-                value: ton("1"),
+                value: ton("0.1"),
                 bounce: false,
                 mode: SendIgnoreErrors,
-                body: TokenTransfer{queryId: msg.queryId,
+                body: TokenTransfer{queryId: 0,
                     amount: amount,
                     destination: msg.from,
-                    responseDestination: msg.from,
-                    customPayload: emptyCell(),
-                    forwardTonAmount: 0,
+                    responseDestination: myAddress(),
+                    customPayload: null,
+                    forwardTonAmount: ton("0.01"),
                     forwardPayload: emptySlice()
                 }.toCell()
             }
