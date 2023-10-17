@@ -83,22 +83,24 @@ contract Task3 with Deployable {
         ////dump("not owner");
         if (ctx.sender == self.jettonAddressA) {
             //dump("jettonA received");
-            let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
-            if(amount == 0){
-                return;
-            }
-            self.bAmount = self.bAmount - amount;
-            self.aAmount = self.aAmount + msg.amount;
+            // let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
+            // if(amount == 0){
+            //     return;
+            // }
+            // self.bAmount = self.bAmount - amount;
+            // self.aAmount = self.aAmount + msg.amount;
+            let amount: Int = ton("1");
             self.swapJettons(msg, self.jettonAddressB, amount);
         }else
         if (ctx.sender == self.jettonAddressB) {
             //dump("jettonB received");
-            let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
-            if(amount == 0){
-                return;
-            }
-            self.aAmount = self.aAmount - amount;
-            self.bAmount = self.bAmount + msg.amount;
+            // let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
+            // if(amount == 0){
+            //     return;
+            // }
+            // self.aAmount = self.aAmount - amount;
+            // self.bAmount = self.bAmount + msg.amount;
+              let amount: Int = ton("1");
             self.swapJettons(msg, self.jettonAddressA, amount);
         }
     }
@@ -158,7 +160,7 @@ contract Task3 with Deployable {
         //dump("send swap");
         //dump(amount);
         send(SendParameters{to: to,
-                value: ton("0.1"),
+                value: ton("1"),
                 bounce: false,
                 mode: 0,
                 body: TokenTransfer{queryId: msg.queryId,
