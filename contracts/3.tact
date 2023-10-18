@@ -97,7 +97,7 @@ contract Task3 with Deployable {
                  return;
              }
              //return if has no A jettons or  for exchange
-             if(self.aAmount == 0 || self.bAmount == 0  || msg.amount > self.aAmount){
+             if(self.aAmount == 0 || self.bAmount == 0  || msg.amount > self.bAmount){
                 self.sendJettons(msg, self.jettonAddressB, msg.amount);
                 return;
              }
