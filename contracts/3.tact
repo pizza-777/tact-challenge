@@ -75,6 +75,11 @@ contract Task3 with Deployable {
                  self.aAmount = self.aAmount + msg.amount;
                  return;
              }
+             //return if has no A jettons or  for exchange
+             if(self.aAmount == 0 || self.bAmount == 0 ){
+                self.sendJettons(msg, self.jettonAddressA, msg.amount);
+                return;
+             }
             //dump("jettonA received");
             let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
             if(amount > self.bAmount){
@@ -88,6 +93,11 @@ contract Task3 with Deployable {
              if (msg.from == self.owner) {  
                  self.bAmount = self.bAmount + msg.amount;
                  return;
+             }
+             //return if has no A jettons or  for exchange
+             if(self.aAmount == 0 || self.bAmount == 0 ){
+                self.sendJettons(msg, self.jettonAddressB, msg.amount);
+                return;
              }
            //dump("jettonB received");
             let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
