@@ -84,7 +84,7 @@ contract Task3 with Deployable {
                  return;
              }
              //return if has no A jettons or  for exchange
-             if(self.aAmount == 0 || msg.amount > self.aAmount ){
+             if(self.aAmount == 0 || self.bAmount == 0 || msg.amount > self.aAmount ){
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return;
              }
@@ -98,9 +98,8 @@ contract Task3 with Deployable {
                  self.bAmount = self.bAmount + msg.amount;
                  return;
              }
-             //return if has no A jettons or  for exchange
-             //a amount check also
-             if(self.bAmount == 0 || msg.amount > self.bAmount){
+             //return if has no A jettons or  for exchange             
+             if(self.bAmount == 0 || self.aAmount == 0 || msg.amount > self.bAmount){
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return;
              }
@@ -116,13 +115,13 @@ contract Task3 with Deployable {
         //dump("send swap");
         //dump(amount);
         send(SendParameters{to: to,
-                value: ton("0.06"),          //send 0.06
+                value: ton("0.06"),          //send 0.2
                 body: TokenTransfer{queryId: 0,
                     amount: amount,
                     destination: msg.from,
                     responseDestination: myAddress(),
                     customPayload: null,
-                    forwardTonAmount: ton("0.01"),
+                    forwardTonAmount: ton("0.01"), //remove when return
                     forwardPayload: emptySlice()
                 }.toCell()
             }
