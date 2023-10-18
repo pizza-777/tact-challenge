@@ -89,11 +89,7 @@ contract Task3 with Deployable {
                 return;
              }
             //dump("jettonA received");
-            let amount: Int = (self.aAmount * self.decimal / self.bAmount)* msg.amount /self.decimal;            
-            // if(amount > self.aAmount){
-            //     self.sendJettons(msg, self.jettonAddressA, msg.amount);
-            //     return;
-            // }
+            let amount: Int = (self.aAmount * self.decimal / self.bAmount)* msg.amount /self.decimal;                       
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;            
             self.sendJettons(msg, self.jettonAddressB, amount);            
@@ -103,23 +99,20 @@ contract Task3 with Deployable {
                  return;
              }
              //return if has no A jettons or  for exchange
+             //
              if(self.bAmount == 0 || msg.amount > self.bAmount){
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return;
              }
            //dump("jettonB received");
-           let amount: Int = (self.bAmount * self.decimal / self.aAmount)* msg.amount /self.decimal  ;
-            // if(amount > self.bAmount){
-            //     self.sendJettons(msg, self.jettonAddressB, msg.amount);
-            //     return;
-            // }
+           let amount: Int = (self.bAmount * self.decimal / self.aAmount)* msg.amount /self.decimal  ;          
             self.aAmount = self.aAmount - amount;
             self.bAmount = self.bAmount + msg.amount;              
             self.sendJettons(msg, self.jettonAddressA, amount);
         }
         return;
     }
-     fun sendJettons(msg: TokenNotification, to: Address, amount: Int) {
+     fun sendJettons(msg: TokenNotification, to: Address, amount: Int) { //check return
         //dump("send swap");
         //dump(amount);
         send(SendParameters{to: to,
@@ -137,8 +130,8 @@ contract Task3 with Deployable {
     }
 
     get fun price(jetton: Address): Int {
-        require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
-        require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
+        // require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
+        // require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton != self.jettonAddressA) {
             return self.aAmount * self.decimal / self.bAmount;
         }
@@ -146,13 +139,17 @@ contract Task3 with Deployable {
     }
   
     get fun balance(jetton: Address): Int {
-        require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
+      //  require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton == self.jettonAddressA) {
             return self.aAmount;
         }
         return self.bAmount;
     }
-    receive(msg: TokenExcesses){
+    // receive(msg: TokenExcesses){//check it
 
-    }
+    // }
+
+    // receive(){//check replenish
+
+    // }
 }
