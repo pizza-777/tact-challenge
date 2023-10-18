@@ -84,12 +84,12 @@ contract Task3 with Deployable {
                  return;
              }
              //return if has no A jettons or  for exchange
-             if(self.aAmount == 0 || self.bAmount == 0 ){
+             if(self.aAmount == 0 || msg.amount > self.aAmount ){
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return;
              }
             //dump("jettonA received");
-            let amount: Int = (self.aAmount * self.decimal / self.bAmount);            
+            let amount: Int = (self.aAmount * self.decimal / self.bAmount)* msg.amount /self.decimal;            
             // if(amount > self.aAmount){
             //     self.sendJettons(msg, self.jettonAddressA, msg.amount);
             //     return;
@@ -103,12 +103,12 @@ contract Task3 with Deployable {
                  return;
              }
              //return if has no A jettons or  for exchange
-             if(self.aAmount == 0 || self.bAmount == 0){
+             if(self.bAmount == 0 || msg.amount > self.bAmount){
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return;
              }
            //dump("jettonB received");
-           let amount: Int = (self.bAmount * self.decimal / self.aAmount)  ;
+           let amount: Int = (self.bAmount * self.decimal / self.aAmount)* msg.amount /self.decimal  ;
             // if(amount > self.bAmount){
             //     self.sendJettons(msg, self.jettonAddressB, msg.amount);
             //     return;
