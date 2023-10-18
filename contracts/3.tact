@@ -91,7 +91,7 @@ contract Task3 with Deployable {
                 return;
              }
             //dump("jettonA received");
-            let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
+            let amount: Int = self.bAmount * self.decimal / self.aAmount;
             // if(amount > self.bAmount){
             //     self.sendJettons(msg, self.jettonAddressA, msg.amount);
             //     return;
@@ -110,7 +110,7 @@ contract Task3 with Deployable {
                 return;
              }
            //dump("jettonB received");
-            let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
+            let amount: Int = self.aAmount * self.decimal / self.bAmount;
             // if(amount > self.aAmount){
             //     self.sendJettons(msg, self.jettonAddressB, msg.amount);
             //     return;
@@ -142,9 +142,9 @@ contract Task3 with Deployable {
         require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
         require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton == self.jettonAddressA) {
-            return (self.aAmount * self.decimal / self.bAmount)/self.decimal;
+            return self.aAmount * self.decimal / self.bAmount;
         }
-        return (self.bAmount * self.decimal / self.aAmount)/self.decimal;
+        return self.bAmount * self.decimal / self.aAmount;
     }
   
     get fun balance(jetton: Address): Int {
