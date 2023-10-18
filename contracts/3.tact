@@ -72,7 +72,7 @@ contract Task3 with Deployable {
       if(ctx.sender != self.jettonAddressA && ctx.sender != self.jettonAddressB){
         throw(1);
       }
-   //   require(msg.amount > 0, "Jetton amount is 0");      
+      require(msg.amount > 0, "Jetton amount is 0");      
         if (ctx.sender == self.jettonAddressA) {
              if (msg.from == self.owner) {  
                  self.aAmount = self.aAmount + msg.amount;
@@ -80,11 +80,11 @@ contract Task3 with Deployable {
              }
              //return if has no A jettons or  for exchange
              if(self.aAmount == 0 || self.bAmount == 0 || msg.amount > self.aAmount ){
-                self.sendJettons(msg, self.jettonAddressA, msg.amount);
+                self.sendJettons(msg, ctx.sender, msg.amount);
                 return;
              }
             //dump("jettonA received");
-            let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
+            let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
             // if(amount > self.bAmount){
             //     self.sendJettons(msg, self.jettonAddressA, msg.amount);
             //     return;
@@ -99,11 +99,11 @@ contract Task3 with Deployable {
              }
              //return if has no A jettons or  for exchange
              if(self.aAmount == 0 || self.bAmount == 0  || msg.amount > self.bAmount){
-                self.sendJettons(msg, self.jettonAddressB, msg.amount);
+                self.sendJettons(msg, ctx.sender, msg.amount);
                 return;
              }
            //dump("jettonB received");
-            let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
+            let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
             // if(amount > self.aAmount){
             //     self.sendJettons(msg, self.jettonAddressB, msg.amount);
             //     return;
@@ -118,7 +118,7 @@ contract Task3 with Deployable {
         //dump("send swap");
         //dump(amount);
         send(SendParameters{to: to,
-                value: ton("1"),          
+                value: ton("0.1"),          
                 body: TokenTransfer{queryId: 0,
                     amount: amount,
                     destination: msg.from,
