@@ -48,6 +48,10 @@ message(0xf8a7ea5) TokenTransfer {
      forwardPayload: Slice as remaining; // should be emptySlice()
 }
 
+message(0xd53276db) TokenExcesses {
+    queryId: Int as uint64;
+}
+
 
 contract Task3 with Deployable {
     owner: Address;
@@ -72,6 +76,9 @@ contract Task3 with Deployable {
       if(ctx.sender != self.jettonAddressA && ctx.sender != self.jettonAddressB){
         throw(1);
       }
+      if(msg.from == myAddress()){
+        return;
+      }
       require(msg.amount > 0, "Jetton amount is 0");      
         if (ctx.sender == self.jettonAddressA) {
              if (msg.from == self.owner) {  
@@ -84,7 +91,7 @@ contract Task3 with Deployable {
                 return;
              }
             //dump("jettonA received");
-            let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
+            let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount /self.decimal;            
             // if(amount > self.bAmount){
             //     self.sendJettons(msg, self.jettonAddressA, msg.amount);
             //     return;
@@ -103,7 +110,7 @@ contract Task3 with Deployable {
                 return;
              }
            //dump("jettonB received");
-            let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
+           let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
             // if(amount > self.aAmount){
             //     self.sendJettons(msg, self.jettonAddressB, msg.amount);
             //     return;
@@ -135,9 +142,9 @@ contract Task3 with Deployable {
         require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
         require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton == self.jettonAddressA) {
-            return (self.aAmount * self.decimal / self.bAmount)/self.decimal;
+            return self.aAmount * self.decimal / self.bAmount;
         }
-        return (self.bAmount * self.decimal / self.aAmount)/self.decimal;
+        return self.bAmount * self.decimal / self.aAmount;
     }
   
     get fun balance(jetton: Address): Int {
@@ -146,5 +153,8 @@ contract Task3 with Deployable {
             return self.aAmount;
         }
         return self.bAmount;
+    }
+    receive(msg: TokenExcesses){
+
     }
 }
