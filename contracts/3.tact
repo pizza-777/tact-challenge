@@ -88,8 +88,8 @@ contract Task3 with Deployable {
             //     self.sendJettons(msg, self.jettonAddressA, msg.amount);
             //     return;
             // }
-            //self.bAmount = self.bAmount - amount;
-            //self.aAmount = self.aAmount + msg.amount;            
+            self.bAmount = self.bAmount - amount;
+            self.aAmount = self.aAmount + msg.amount;            
             self.sendJettons(msg, self.jettonAddressB, amount);            
         }else{
              if (msg.from == self.owner) {  
@@ -107,8 +107,8 @@ contract Task3 with Deployable {
             //     self.sendJettons(msg, self.jettonAddressB, msg.amount);
             //     return;
             // }
-            //self.aAmount = self.aAmount - amount;
-            //self.bAmount = self.bAmount + msg.amount;              
+            self.aAmount = self.aAmount - amount;
+            self.bAmount = self.bAmount + msg.amount;              
             self.sendJettons(msg, self.jettonAddressA, amount);
         }
         return;
@@ -119,7 +119,7 @@ contract Task3 with Deployable {
         send(SendParameters{to: to,
                 value: ton("0.1"),
                 bounce: true,
-                mode: SendIgnoreErrors,
+                mode: 0,
                 body: TokenTransfer{queryId: 0,
                     amount: amount,
                     destination: msg.from,
