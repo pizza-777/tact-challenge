@@ -48,6 +48,10 @@ message(0xf8a7ea5) TokenTransfer {
      forwardPayload: Slice as remaining; // should be emptySlice()
 }
 
+message(0xd53276db) TokenExcesses {
+    queryId: Int as uint64;
+}
+
 
 contract Task3 with Deployable {
     owner: Address;
@@ -150,5 +154,7 @@ contract Task3 with Deployable {
         }
         return self.bAmount;
     }
-    // receive(){}
+    receive(msg: TokenExcesses){
+
+    }
 }
