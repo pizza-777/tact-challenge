@@ -99,7 +99,7 @@ contract Task3 with Deployable {
                  return;
              }
              //return if has no A jettons or  for exchange
-             //
+             //a amount check also
              if(self.bAmount == 0 || msg.amount > self.bAmount){
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return;
@@ -116,7 +116,7 @@ contract Task3 with Deployable {
         //dump("send swap");
         //dump(amount);
         send(SendParameters{to: to,
-                value: ton("0.1"),          
+                value: ton("0.06"),          //send 0.06
                 body: TokenTransfer{queryId: 0,
                     amount: amount,
                     destination: msg.from,
