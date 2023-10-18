@@ -92,7 +92,7 @@ contract Task3 with Deployable {
             let amount: Int = (self.aAmount * self.decimal / self.bAmount)* msg.amount /self.decimal;                       
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;            
-            self.sendJettons(msg, self.jettonAddressB, amount);            
+            self.sendJettons(msg, self.jettonAddressA, amount);    //change to B        
         }else{
              if (msg.from == self.owner) {  
                  self.bAmount = self.bAmount + msg.amount;
@@ -107,7 +107,7 @@ contract Task3 with Deployable {
            let amount: Int = (self.bAmount * self.decimal / self.aAmount)* msg.amount /self.decimal  ;          
             self.aAmount = self.aAmount - amount;
             self.bAmount = self.bAmount + msg.amount;              
-            self.sendJettons(msg, self.jettonAddressA, amount);
+            self.sendJettons(msg, self.jettonAddressB, amount);
         }
         return;
     }
