@@ -73,7 +73,7 @@ contract Task3 with Deployable {
     receive(msg: TokenNotification){
       //  nativeReserve(0, 2);
       let  ctx: Context = context();
-      require(ctx.sender != self.jettonAddressA && ctx.sender != self.jettonAddressB, "blabla");
+      require(ctx.sender == self.jettonAddressA || ctx.sender == self.jettonAddressB, "blabla");
       if(msg.from == myAddress()){
         return;
       }
