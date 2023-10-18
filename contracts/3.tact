@@ -148,7 +148,7 @@ contract Task3 with Deployable {
 
     // }
 
-    // receive(){//check replenish
+    receive(){//check replenish
 
-    // }
+    }
 }
