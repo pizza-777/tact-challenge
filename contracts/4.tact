@@ -84,9 +84,9 @@ contract Task4 with Deployable {
          let ctx: Context = context();    
         require(ctx.sender != self.owner, "Invalid sender");  
         require(msg.nftAddress == self.nft, "check nft");     
-        if (self.lockedUntil!! > now()) {
-            self.reply("NFT is still locked".asComment()); // ? is it according to the TON's "message with text comment" standard ?                    
-        } // else {
+        // if (self.lockedUntil!! > now()) {
+        //     self.reply("NFT is still locked".asComment()); // ? is it according to the TON's "message with text comment" standard ?                    
+        // } // else {
         //     //what does it "mean send nft?"
         //     //maybe ownership assigned for new owner
         //     //look at this https://github.com/howardpen9/nft-template-in-tact/blob/84b33672a58e68eb6b6714c65c809426224231b1/sources/contract.tact
