@@ -117,7 +117,7 @@ contract Task4 with Deployable {
     }
 
     get fun time(): Int {      
-        return self.lockedTime ;    //correct. So its time before in timestamp seconds  
+        return self.lockedUntil - now() ;    //correct. So its time before in timestamp seconds  
     }
 
     get fun nft(): Address? {
