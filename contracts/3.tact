@@ -76,7 +76,7 @@ contract Task3 with Deployable {
         //     return ;
         // }
         //check the new price aftr money comes
-        require(ctx.sender == self.jettonAddressA || ctx.sender == self.jettonAddressB, "blabla");
+        require(ctx.sender == self.jettonAddressA || ctx.sender == self.jettonAddressB, "0");
         //require(msg.amount > 0, "Jetton amount is 0");
         if (ctx.sender == self.jettonAddressA) {
             if (msg.from == self.owner) {
@@ -91,7 +91,7 @@ contract Task3 with Deployable {
 
             //dump("jettonA received");
 
-            let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
+            let amount: Int = self.bAmount * 1000000000 / self.aAmount * msg.amount / 1000000000;
             if (amount > self.bAmount) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 //self.aAmount = self.aAmount - msg.amount;
@@ -115,7 +115,7 @@ contract Task3 with Deployable {
             }
             //dump("jettonB received");
             // self.bAmount = self.bAmount + msg.amount;
-            let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
+            let amount: Int = self.aAmount * 1000000000 / self.bAmount * msg.amount / 1000000000;
             if (amount > self.aAmount) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 //  self.bAmount = self.bAmount - msg.amount;
@@ -153,9 +153,9 @@ contract Task3 with Deployable {
         // require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
         // require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton == self.jettonAddressA) {
-            return self.bAmount * self.decimal / self.aAmount;
+            return self.bAmount * 1000000000 / self.aAmount;
         }
-        return self.aAmount * self.decimal / self.bAmount;
+        return self.aAmount * 1000000000 / self.bAmount;
     }
 
     get fun balance(jetton: Address): Int {
