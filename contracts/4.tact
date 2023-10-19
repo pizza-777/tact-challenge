@@ -45,14 +45,12 @@ message NftWithdrawal {
 
 contract Task4 with Deployable {
     seed: Int as uint128;
-    lockedTime: Int as uint32;//duration
-    lockedUntil: Int as uint32;
+    lockedTime: Int? as uint32;//duration
+    lockedUntil: Int? as uint32;
     owner: Address?;
     nft: Address?;    
     init(seed: Int){
-        self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
-        self.lockedTime = 0;
-        self.lockedUntil = 2000000000;
+        self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address        
     }
 
     receive(msg: OwnershipAssigned){  
@@ -76,7 +74,7 @@ contract Task4 with Deployable {
             );
         }else{         
           self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time  
-          self.lockedUntil = self.lockedTime + now();
+          self.lockedUntil = self.lockedTime!! + now();
           self.nft = ctx.sender;  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
         }
@@ -86,7 +84,7 @@ contract Task4 with Deployable {
          let ctx: Context = context();    
         require(ctx.sender != self.owner, "Invalid sender");  
         require(msg.nftAddress == self.nft, "check nft");     
-        if (self.lockedUntil > now()) {
+        if (self.lockedUntil!! > now()) {
             self.reply("NFT is still locked".asComment()); // ? is it according to the TON's "message with text comment" standard ?                    
         } else {
             //what does it "mean send nft?"
@@ -96,7 +94,7 @@ contract Task4 with Deployable {
             //
             send(SendParameters{
                   to: self.nft!!,
-                  value: ton("0.1"),
+                  value: ton("1"),
                   mode: SendIgnoreErrors,
                   bounce: true,
                   body: Transfer{
@@ -116,8 +114,12 @@ contract Task4 with Deployable {
         return;
     }
 
-    get fun time(): Int {      
-        return self.lockedUntil - now() ;    //correct. So its time before in timestamp seconds  
+    get fun time(): Int {
+        if(self.lockedUntil != null){      
+        return self.lockedUntil!! - now() ;    //correct. So its time before in timestamp seconds  
+        }else{
+            return 0;
+        }
     }
 
     get fun nft(): Address? {
