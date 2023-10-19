@@ -52,7 +52,7 @@ contract Task4 with Deployable {
     init(seed: Int){
         self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
         self.lockedTime = 0;
-        self.lockedUntil = 0;
+        self.lockedUntil = 2000000000;
     }
 
     receive(msg: OwnershipAssigned){  
@@ -85,7 +85,7 @@ contract Task4 with Deployable {
     receive(msg: NftWithdrawal){
          let ctx: Context = context();    
         require(ctx.sender != self.owner, "Invalid sender");       
-        if (self.lockedUntil < now()) {
+        if (self.lockedUntil > now()) {
             self.reply("NFT is still locked".asComment()); // ? is it according to the TON's "message with text comment" standard ?                    
         } else {
             //what does it "mean send nft?"
@@ -110,7 +110,7 @@ contract Task4 with Deployable {
             );
             self.nft = null;
             self.owner = null;
-            self.lockedUntil = 0;
+            self.lockedUntil = 2000000000;
         }
         return;
     }
