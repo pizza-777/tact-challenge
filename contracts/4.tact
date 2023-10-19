@@ -45,11 +45,12 @@ message NftWithdrawal {
 
 contract Task4 with Deployable {
     seed: Int as uint128;
-    lockedTime: Int as uint32 = 0; //кто его устанавливает ,овнер? 
+    lockedTime: Int as uint32;
     owner: Address?;
-    nft: Address?;
+    nft: Address?;    
     init(seed: Int){
         self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
+        self.lockedTime = 0;
     }
 
     receive(msg: OwnershipAssigned){  
@@ -59,20 +60,20 @@ contract Task4 with Deployable {
             send(SendParameters{
                     to: ctx.sender,
                     value: ton("0.1"),
-                    mode: SendPayGasSeparately + SendIgnoreErrors,
+                    mode: SendIgnoreErrors,
                     bounce: true,
                     body: Transfer{
                       queryId: 0,
                       newOwner: msg.prevOwner,
                       responseDestination: myAddress(),    
-                      forwardAmount: ton("0.01"),
-                      forwardPayload: emptySlice(),//? should I need to change prevOwner? No
+                      forwardAmount: 0,
+                      forwardPayload: emptySlice(),
                       customPayload: null 
                     }.toCell()
                 }
             );
         }else{         
-          self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time  
+          self.lockedTime = msg.forwardPayload.loadUint(32) + now(); // load locked time  
           self.nft = ctx.sender;  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
         }
@@ -80,8 +81,7 @@ contract Task4 with Deployable {
 
     receive(msg: NftWithdrawal){
          let ctx: Context = context();    
-        require(ctx.sender != self.owner, "Invalid sender");
-        require(self.lockedTime > 0, "Locked time not set");
+        require(ctx.sender != self.owner, "Invalid sender");       
         if (self.lockedTime > now()) {
             self.reply("NFT is still locked".asComment()); // ? is it according to the TON's "message with text comment" standard ?                    
         } else {
@@ -93,13 +93,13 @@ contract Task4 with Deployable {
             send(SendParameters{
                   to: self.nft!!,
                   value: ton("0.1"),
-                  mode: SendPayGasSeparately + SendIgnoreErrors,
+                  mode: SendIgnoreErrors,
                   bounce: true,
                   body: Transfer{
                       queryId: 0,                      
                       newOwner: self.owner!!,
                       responseDestination: myAddress(),    
-                      forwardAmount: ton("0.01"),
+                      forwardAmount: 0,
                       customPayload: null,
                       forwardPayload: emptySlice()     
                     }.toCell()
@@ -107,7 +107,7 @@ contract Task4 with Deployable {
             );
             self.nft = null;
             self.owner = null;
-            self.lockedTime = now();
+            self.lockedTime = 0;
         }
     }
 
