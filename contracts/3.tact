@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -83,20 +84,20 @@ contract Task3 with Deployable {
                 return ;
             }
             //return if has no A jettons or  for exchange
-            if (self.aAmount == 0 || self.bAmount == 0 ) {
+            if (self.aAmount == 0 || self.bAmount == 0) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return ;
             }
+
             //dump("jettonA received");
-            
-            let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
+
+            let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
             if (amount > self.bAmount) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
-                      //self.aAmount = self.aAmount - msg.amount;
+                //self.aAmount = self.aAmount - msg.amount;
                 return ;
             }
-           
-            self.sendJettons(msg,  self.jettonAddressB, amount); //change to B
+            self.sendJettons(msg, self.jettonAddressB, amount); //change to B
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;
         } else {
@@ -114,12 +115,12 @@ contract Task3 with Deployable {
             let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
             if (amount > self.aAmount) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
-               //  self.bAmount = self.bAmount - msg.amount;
+                //  self.bAmount = self.bAmount - msg.amount;
                 return ;
             }
-           
-            self.sendJettons(msg,  self.jettonAddressA, amount);
-             self.aAmount = self.aAmount - amount;           
+            self.sendJettons(msg, self.jettonAddressA, amount);
+            self.aAmount = self.aAmount - amount;
+            self.aAmount = self.bAmount + msg.amount;
         }
         return ;
     }
@@ -141,7 +142,6 @@ contract Task3 with Deployable {
             }
         );
     }
-    
 
     get fun price(jetton: Address): Int {
         // require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
