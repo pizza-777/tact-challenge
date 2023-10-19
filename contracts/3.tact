@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -38,17 +39,19 @@ message(0x7362d09c) TokenNotification {
     forwardPayload: Slice as remaining;
 }
 message(0xf8a7ea5) TokenTransfer {
-    queryId: Int as uint64; // should be 0
-    amount: Int as coins; // should be amount of jettons to send
-    destination: Address; // should be user address / TokenNotification.from
-    responseDestination: Address?; // should be myAddress()
-    customPayload: Cell?; // should be null
-    forwardTonAmount: Int as coins; // should be ton("0.01")
-    forwardPayload: Slice as remaining; // should be emptySlice()
+     queryId: Int as uint64; // should be 0
+     amount: Int as coins; // should be amount of jettons to send
+     destination: Address; // should be user address / TokenNotification.from
+     responseDestination: Address?; // should be myAddress()
+     customPayload: Cell?; // should be null
+     forwardTonAmount: Int as coins; // should be ton("0.01")
+     forwardPayload: Slice as remaining; // should be emptySlice()
 }
+
 message(0xd53276db) TokenExcesses {
     queryId: Int as uint64;
 }
+
 
 contract Task3 with Deployable {
     owner: Address;
@@ -68,72 +71,65 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        //  nativeReserve(0, 2);
-        let ctx: Context = context();
-        if (ctx.sender != self.jettonAddressA && ctx.sender != self.jettonAddressB) {
-            throw(1);
-        }
-        if (msg.from == myAddress()) {
-            return ;
-        }
-        require(msg.amount > 0, "Jetton amount is 0");
+      //  nativeReserve(0, 2);
+      let  ctx: Context = context();
+      require(ctx.sender == self.jettonAddressA || ctx.sender == self.jettonAddressB, "blabla");
+      if(msg.from == myAddress()){
+        return;
+      }
+      require(msg.amount > 0, "Jetton amount is 0");      
         if (ctx.sender == self.jettonAddressA) {
-            if (msg.from == self.owner) {
-                self.aAmount = self.aAmount + msg.amount;
-                return ;
-            }
-            //return if has no A jettons or  for exchange
-            if (self.aAmount == 0 || self.bAmount == 0 || msg.amount > self.aAmount) {
-                require(ctx.value > ton("0.1"), "Insufissient gas");
+             if (msg.from == self.owner) {  
+                 self.aAmount = self.aAmount + msg.amount;
+                 return;
+             }
+             //return if has no A jettons or  for exchange
+             if(self.aAmount == 0 || self.bAmount == 0 || msg.amount > self.aAmount ){
                 self.sendJettons(msg, ctx.sender, msg.amount);
-                return ;
-            }
+                return;
+             }
             //dump("jettonA received");
-            let amount: Int = self.aAmount * self.decimal / self.bAmount / self.decimal;
-            if (amount > self.bAmount) {
-                require(ctx.value > ton("0.1"), "Insufissient gas");
-                self.sendJettons(msg, ctx.sender, msg.amount);
-                return ;
-            }
+            let amount: Int = (self.aAmount * self.decimal / self.bAmount)* msg.amount /self.decimal;
+            if(amount > self.bAmount){
+                  self.sendJettons(msg, ctx.sender, msg.amount);
+                  return;
+            }                       
             self.bAmount = self.bAmount - amount;
-            self.aAmount = self.aAmount + msg.amount;
-            self.sendJettons(msg, self.jettonAddressB, amount);
-        } else {
-            if (msg.from == self.owner) {
-                self.bAmount = self.bAmount + msg.amount;
-                return ;
-            }
-            //return if has no A jettons or  for exchange
-            if (self.aAmount == 0 || self.bAmount == 0 || msg.amount > self.bAmount) {
-                require(ctx.value > ton("0.1"), "Insufissient gas");
+            self.aAmount = self.aAmount + msg.amount;            
+            self.sendJettons(msg, self.jettonAddressB, amount);    //change to B        
+        }else{
+             if (msg.from == self.owner) {  
+                 self.bAmount = self.bAmount + msg.amount;
+                 return;
+             }
+             //return if has no A jettons or  for exchange             
+             if(self.bAmount == 0 || self.aAmount == 0 || msg.amount > self.bAmount){
                 self.sendJettons(msg, ctx.sender, msg.amount);
-                return ;
-            }
-            //dump("jettonB received");
-            let amount: Int = self.bAmount * self.decimal / self.aAmount / self.decimal;
-            if (amount > self.aAmount) {
-                require(ctx.value > ton("0.1"), "Insufissient gas");
-                self.sendJettons(msg, self.jettonAddressB, msg.amount);
-                return ;
-            }
+                return;
+             }
+           //dump("jettonB received");
+           let amount: Int = (self.bAmount * self.decimal / self.aAmount)* msg.amount /self.decimal  ;    
+           if(amount > self.aAmount){
+                  self.sendJettons(msg, ctx.sender, msg.amount);
+                  return;
+            }          
             self.aAmount = self.aAmount - amount;
-            self.bAmount = self.bAmount + msg.amount;
-            self.sendJettons(msg, self.jettonAddressA, amount);
+            self.bAmount = self.bAmount + msg.amount;              
+            self.sendJettons(msg, self.jettonAddressB, amount);
         }
-        return ;
+        return;
     }
-
-     fun sendJettons(msg: TokenNotification, to: Address, amount: Int) {
+     fun sendJettons(msg: TokenNotification, to: Address, amount: Int) { //check return
         //dump("send swap");
         //dump(amount);
         send(SendParameters{to: to,
-                value: ton("0.1"),
+                value: ton("0.1"),          //send 0.2
                 body: TokenTransfer{queryId: 0,
                     amount: amount,
                     destination: msg.from,
                     responseDestination: myAddress(),
                     customPayload: null,
-                    forwardTonAmount: ton("0.01"),
+                    forwardTonAmount: ton("0.01"), //remove when return
                     forwardPayload: emptySlice()
                 }.toCell()
             }
@@ -141,21 +137,26 @@ contract Task3 with Deployable {
     }
 
     get fun price(jetton: Address): Int {
-        require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
-        require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
+        // require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
+        // require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton != self.jettonAddressA) {
             return self.aAmount * self.decimal / self.bAmount;
         }
         return self.bAmount * self.decimal / self.aAmount;
     }
-
+  
     get fun balance(jetton: Address): Int {
-        //  require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
+      //  require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton == self.jettonAddressA) {
             return self.aAmount;
         }
         return self.bAmount;
     }
+    // receive(msg: TokenExcesses){//check it
 
-    receive(msg: TokenExcesses){}
+    // }
+
+    // receive(){//check replenish
+
+    // }
 }
