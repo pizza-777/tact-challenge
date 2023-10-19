@@ -147,9 +147,9 @@ contract Task3 with Deployable {
         // require(self.aAmount > 0 && self.bAmount > 0, "Wrong amount");
         // require(jetton == self.jettonAddressA || jetton == self.jettonAddressB, "Wrong addr");
         if (jetton == self.jettonAddressA) {
-            return self.aAmount * self.decimal / self.bAmount;
+            return self.bAmount * self.decimal / self.aAmount;
         }
-        return self.bAmount * self.decimal / self.aAmount;
+        return self.aAmount * self.decimal / self.bAmount;
     }
 
     get fun balance(jetton: Address): Int {
