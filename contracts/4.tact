@@ -88,18 +88,17 @@ contract Task4 with Deployable {
         // if( self.nft != msg.nftAddress){
         //     return;
         // }
-        // self.nft = null;
-        //     self.owner = null;
-        //     self.lockedUntil = null;
+            self.nft = null;
+            self.owner = null;
+            self.lockedUntil = null;
             send(SendParameters{
                   to: msg.nftAddress,
-                  value: 0,
-                  mode: SendRemainingBalance,
+                  value: ton("0.1"),                  
                   body: Transfer{
                       queryId: 0,                      
                       newOwner: self.owner!!,
                       responseDestination: myAddress(),    
-                      forwardAmount: 0,
+                      forwardAmount: ctx.value,
                       customPayload: null,
                       forwardPayload: emptySlice()     
                     }.toCell()
