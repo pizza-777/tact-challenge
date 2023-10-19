@@ -85,7 +85,7 @@ contract Task4 with Deployable {
     receive(msg: NftWithdrawal){
          let ctx: Context = context();    
         require(ctx.sender != self.owner, "Invalid sender");       
-        if (self.lockedUntil > now()) {
+        if (self.lockedUntil < now()) {
             self.reply("NFT is still locked".asComment()); // ? is it according to the TON's "message with text comment" standard ?                    
         } else {
             //what does it "mean send nft?"
@@ -102,7 +102,7 @@ contract Task4 with Deployable {
                       queryId: 0,                      
                       newOwner: self.owner!!,
                       responseDestination: myAddress(),    
-                      forwardAmount: 0,
+                      forwardAmount: ton("0.01"),
                       customPayload: null,
                       forwardPayload: emptySlice()     
                     }.toCell()
@@ -112,6 +112,7 @@ contract Task4 with Deployable {
             self.owner = null;
             self.lockedUntil = 0;
         }
+        return;
     }
 
     get fun time(): Int {      
