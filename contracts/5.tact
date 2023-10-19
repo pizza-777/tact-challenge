@@ -83,7 +83,8 @@ contract Task5 with Deployable {
     self.totalNftsHeld = 0;
   }
  
-  receive(msg: OwnershipAssigned) {   
+  receive(msg: OwnershipAssigned) {  
+    nativeReserve(2, 2); 
     //if prevOwner is the owner's (admin) address, then add NFT to the collection
     let ctx: Context = context();
     if(msg.prevOwner == self.owner){
