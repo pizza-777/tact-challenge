@@ -55,29 +55,29 @@ contract Task4 with Deployable {
 
     receive(msg: OwnershipAssigned){  
         let ctx: Context = context();          
-        if (self.nft != null) { //if nft already holded - return nft back to the sender (nft contract)
-            //return back nft
-            send(SendParameters{
-                    to: ctx.sender,
-                    value: ton("0.1"),
-                    mode: SendIgnoreErrors,
-                    bounce: true,
-                    body: Transfer{
-                      queryId: 0,
-                      newOwner: msg.prevOwner,
-                      responseDestination: myAddress(),    
-                      forwardAmount: ton("0.01"),
-                      forwardPayload: emptySlice(),
-                      customPayload: null 
-                    }.toCell()
-                }
-            );
-        }else{         
+        // if (self.nft != null) { //if nft already holded - return nft back to the sender (nft contract)
+        //     //return back nft
+        //     send(SendParameters{
+        //             to: ctx.sender,
+        //             value: ton("0.1"),
+        //             mode: SendIgnoreErrors,
+        //             bounce: true,
+        //             body: Transfer{
+        //               queryId: 0,
+        //               newOwner: msg.prevOwner,
+        //               responseDestination: myAddress(),    
+        //               forwardAmount: ton("0.01"),
+        //               forwardPayload: emptySlice(),
+        //               customPayload: null 
+        //             }.toCell()
+        //         }
+        //     );
+        // }else{         
           self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time  
           self.lockedUntil = self.lockedTime!! + now();
           self.nft = ctx.sender;  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
-        }
+        // }
     }
 
     receive(msg: NftWithdrawal){
