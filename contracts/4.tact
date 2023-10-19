@@ -87,7 +87,9 @@ contract Task4 with Deployable {
         // if( self.nft != msg.nftAddress){
         //     return;
         // }
-        
+        self.nft = null;
+            self.owner = null;
+            self.lockedUntil = null;
             send(SendParameters{
                   to: self.nft!!,
                   value: 0,
@@ -101,12 +103,7 @@ contract Task4 with Deployable {
                       forwardPayload: emptySlice()     
                     }.toCell()
                 }
-            );
-            self.nft = null;
-            self.owner = null;
-            self.lockedUntil = null;
-        
-        return;
+            );               
         }
     }
 
