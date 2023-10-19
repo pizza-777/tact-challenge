@@ -101,9 +101,9 @@ contract Task4 with Deployable {
                     }.toCell()
                 }
             );
-            self.nft = null;
-            self.owner = null;
-            self.lockedUntil = null;
+            // self.nft = null;
+            // self.owner = null;
+            // self.lockedUntil = null;
         
         return;
     }
