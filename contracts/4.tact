@@ -73,7 +73,7 @@ contract Task4 with Deployable {
                     }.toCell()
                 }
             );
-        return;
+      
     }
 
     receive(msg: NftWithdrawal){
