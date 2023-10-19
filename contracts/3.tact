@@ -110,7 +110,7 @@ contract Task3 with Deployable {
                 return ;
             }
             //dump("jettonB received");
-             self.bAmount = self.bAmount + msg.amount;
+            // self.bAmount = self.bAmount + msg.amount;
             let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
             if (amount > self.aAmount) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
