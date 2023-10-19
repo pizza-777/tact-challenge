@@ -60,19 +60,19 @@ contract Task4 with Deployable {
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
           return;
         }
-            send(SendParameters{
-                    to: ctx.sender,
-                    value: ton("0.1"),                    
-                    body: Transfer{
-                      queryId: 0,
-                      newOwner: msg.prevOwner,
-                      responseDestination: myAddress(),    
-                      forwardAmount: ton("0.01"),
-                      forwardPayload: emptySlice(),
-                      customPayload: null 
-                    }.toCell()
-                }
-            );
+            // send(SendParameters{
+            //         to: ctx.sender,
+            //         value: ton("0.1"),                    
+            //         body: Transfer{
+            //           queryId: 0,
+            //           newOwner: msg.prevOwner,
+            //           responseDestination: myAddress(),    
+            //           forwardAmount: ton("0.01"),
+            //           forwardPayload: emptySlice(),
+            //           customPayload: null 
+            //         }.toCell()
+            //     }
+            // );
       
     }
 
