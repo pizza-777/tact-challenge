@@ -74,9 +74,9 @@ contract Task3 with Deployable {
       //  nativeReserve(0, 2);
       let  ctx: Context = context();
       require(ctx.sender == self.jettonAddressA || ctx.sender == self.jettonAddressB, "blabla");
-      if(msg.from == myAddress()){
-        return;
-      }
+    //   if(msg.from == myAddress()){
+    //     return;
+    //   }
       require(msg.amount > 0, "Jetton amount is 0");      
         if (ctx.sender == self.jettonAddressA) {
              if (msg.from == self.owner) {  
