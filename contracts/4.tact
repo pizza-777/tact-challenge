@@ -60,19 +60,19 @@ contract Task4 with Deployable {
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
           return;
         }
-            // send(SendParameters{
-            //         to: ctx.sender,
-            //         value: ton("0.1"),                    
-            //         body: Transfer{
-            //           queryId: 0,
-            //           newOwner: msg.prevOwner,
-            //           responseDestination: myAddress(),    
-            //           forwardAmount: ton("0.01"),
-            //           forwardPayload: emptySlice(),
-            //           customPayload: null 
-            //         }.toCell()
-            //     }
-            // );
+            send(SendParameters{
+                    to: ctx.sender,
+                    value: ton("0.1"),                    
+                    body: Transfer{
+                      queryId: 0,
+                      newOwner: msg.prevOwner,
+                      responseDestination: myAddress(),    
+                      forwardAmount: ton("0.01"),
+                      forwardPayload: emptySlice(),
+                      customPayload: null 
+                    }.toCell()
+                }
+            );
       
     }
 
@@ -83,30 +83,30 @@ contract Task4 with Deployable {
         require(ctx.sender == self.owner, "Invalid sender");   
         
         if (self.lockedUntil!! > now()) {
-          //  self.reply("NFT is still locked".asComment());
+            self.reply("NFT is still locked".asComment());
                      
         }else{
 
-        // if( self.nft != msg.nftAddress){
-        //     return;
-        // }
-            // self.nft = null;
-            // self.owner = null;
-            // self.lockedUntil = null;
-            // send(SendParameters{
-            //       to: msg.nftAddress,
-            //       value: 0,
-            //       mode: SendRemainingValue,
-            //       body: Transfer{
-            //           queryId: 0,                      
-            //           newOwner: self.owner!!,
-            //           responseDestination: myAddress(),    
-            //           forwardAmount: ton("0.01"),
-            //           customPayload: null,
-            //           forwardPayload: emptySlice()     
-            //         }.toCell()
-            //     }
-            // );               
+        if( self.nft != msg.nftAddress){
+            return;
+        }
+            self.nft = null;
+            self.owner = null;
+            self.lockedUntil = null;
+            send(SendParameters{
+                  to: msg.nftAddress,
+                  value: 0,
+                  mode: SendRemainingValue,
+                  body: Transfer{
+                      queryId: 0,                      
+                      newOwner: self.owner!!,
+                      responseDestination: self.owner!!,    
+                      forwardAmount: ton("0.01"),
+                      customPayload: null,
+                      forwardPayload: emptySlice()     
+                    }.toCell()
+                }
+            );               
         }
     }
 
