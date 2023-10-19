@@ -93,7 +93,7 @@ contract Task4 with Deployable {
                   value: ton("0.1"),
                   body: Transfer{
                       queryId: 0,                      
-                      newOwner: msg.nftAddress,
+                      newOwner: self.nft!!,
                       responseDestination: myAddress(),    
                       forwardAmount: ton("0.01"),
                       customPayload: null,
