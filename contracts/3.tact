@@ -89,11 +89,12 @@ contract Task3 with Deployable {
                 return;
              }
             //dump("jettonA received");
-            let amount: Int = (self.aAmount * self.decimal / self.bAmount)* msg.amount /self.decimal;
-            if(amount > self.bAmount){
-                  self.sendJettons(msg, ctx.sender, msg.amount);
-                  return;
-            }                       
+            // let amount: Int = (self.aAmount * self.decimal / self.bAmount)* msg.amount /self.decimal;
+            // if(amount > self.bAmount){
+            //       self.sendJettons(msg, ctx.sender, msg.amount);
+            //       return;
+            // }          
+            let amount : Int = self.bAmount/2;             
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;            
             self.sendJettons(msg, self.jettonAddressB, amount);    //change to B        
@@ -108,11 +109,12 @@ contract Task3 with Deployable {
                 return;
              }
            //dump("jettonB received");
-           let amount: Int = (self.bAmount * self.decimal / self.aAmount)* msg.amount /self.decimal  ;    
-           if(amount > self.aAmount){
-                  self.sendJettons(msg, ctx.sender, msg.amount);
-                  return;
-            }          
+        //    let amount: Int = (self.bAmount * self.decimal / self.aAmount)* msg.amount /self.decimal  ;    
+        //    if(amount > self.aAmount){
+        //           self.sendJettons(msg, ctx.sender, msg.amount);
+        //           return;
+        //     }  
+        let amount: Int = self.aAmount/2;        
             self.aAmount = self.aAmount - amount;
             self.bAmount = self.bAmount + msg.amount;              
             self.sendJettons(msg, self.jettonAddressB, amount);
