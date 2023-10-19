@@ -94,7 +94,7 @@ contract Task5 with Deployable {
     //  if value of TON attached is less then 2.1 TON then stop execution and return NFT back,
     //  but only in case that TON attached is enough to process refund without losing TONs on the SC's balance 
     if(ctx.value < ton("2.1")){  
-        require(ctx.value > ton("0.1"), "Insufissient gas");   
+       // require(ctx.value > ton("0.1"), "Insufissient gas");   
       send(SendParameters{
         to: ctx.sender,
         value: ton("0.1"),
@@ -168,7 +168,7 @@ contract Task5 with Deployable {
       self.totalNftsHeld = self.totalNftsHeld - 1;
       send(SendParameters{
         to: self.nftCollection.get(self.totalNftsHeld)!!,
-        value: ton("0.08"),//check it ?
+        value: ton("0.06"),
         mode: 0,
         bounce: false,
         body: Transfer{
