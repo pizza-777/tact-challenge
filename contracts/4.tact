@@ -99,7 +99,7 @@ contract Task4 with Deployable {
                       queryId: 0,                      
                       newOwner: self.owner!!,
                       responseDestination: myAddress(),    
-                      forwardAmount: ton("0.01"),
+                      forwardAmount: 0,
                       customPayload: null,
                       forwardPayload: emptySlice()     
                     }.toCell()
