@@ -54,37 +54,36 @@ contract Task4 with Deployable {
 
     receive(msg: OwnershipAssigned){  
         let ctx: Context = context();          
-        // if (self.nft != null) { //if nft already holded - return nft back to the sender (nft contract)
-        //     //return back nft
-        //     send(SendParameters{
-        //             to: ctx.sender,
-        //             value: ton("0.1"),
-        //             mode: SendIgnoreErrors,
-        //             bounce: true,
-        //             body: Transfer{
-        //               queryId: 0,
-        //               newOwner: msg.prevOwner,
-        //               responseDestination: myAddress(),    
-        //               forwardAmount: ton("0.01"),
-        //               forwardPayload: emptySlice(),
-        //               customPayload: null 
-        //             }.toCell()
-        //         }
-        //     );
-        // }else{                   
+        if (self.nft != null) { //if nft already holded - return nft back to the sender (nft contract)
+            //return back nft
+            send(SendParameters{
+                    to: ctx.sender,
+                    value: ton("0.1"),                    
+                    body: Transfer{
+                      queryId: 0,
+                      newOwner: msg.prevOwner,
+                      responseDestination: myAddress(),    
+                      forwardAmount: ton("0.01"),
+                      forwardPayload: emptySlice(),
+                      customPayload: null 
+                    }.toCell()
+                }
+            );
+        }else{                   
           self.lockedUntil = msg.forwardPayload.loadUint(32) + now();
           self.nft = ctx.sender;  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
-        // }
+        }
     }
 
     receive(msg: NftWithdrawal){
         let ctx: Context = context();    
         require(ctx.sender != self.owner, "Invalid sender");  
-        require(msg.nftAddress == self.nft, "check nft");     
-        // if (self.lockedUntil!! > now()) {
-        //     self.reply("NFT is still locked".asComment()); // ? is it according to the TON's "message with text comment" standard ?                    
-        // } // else {
+        require(msg.nftAddress == self.nft, "check nft");
+        require(self.lockedUntil != null, "time ok");
+        if (self.lockedUntil!! > now()) {
+            self.reply("NFT is still locked".asComment()); // ? is it according to the TON's "message with text comment" standard ?                    
+        } // else {
         //     //what does it "mean send nft?"
         //     //maybe ownership assigned for new owner
         //     //look at this https://github.com/howardpen9/nft-template-in-tact/blob/84b33672a58e68eb6b6714c65c809426224231b1/sources/contract.tact
