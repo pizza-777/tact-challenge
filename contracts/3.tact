@@ -77,7 +77,7 @@ contract Task3 with Deployable {
         }
         //check the new price aftr money comes
         require(ctx.sender == self.jettonAddressA || ctx.sender == self.jettonAddressB, "blabla");
-        require(msg.amount > 0, "Jetton amount is 0");
+        //require(msg.amount > 0, "Jetton amount is 0");
         if (ctx.sender == self.jettonAddressA) {
             if (msg.from == self.owner) {
                 self.aAmount = self.aAmount + msg.amount;
