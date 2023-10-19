@@ -44,8 +44,7 @@ message NftWithdrawal {
 }
 
 contract Task4 with Deployable {
-    seed: Int as uint128;
-    lockedTime: Int? as uint32;//duration
+    seed: Int as uint128;   
     lockedUntil: Int? as uint32;
     owner: Address?;
     nft: Address?;    
@@ -72,16 +71,15 @@ contract Task4 with Deployable {
         //             }.toCell()
         //         }
         //     );
-        // }else{         
-          self.lockedTime = msg.forwardPayload.loadUint(32); // load locked time  
-          self.lockedUntil = self.lockedTime!! + now();
+        // }else{                   
+          self.lockedUntil = msg.forwardPayload.loadUint(32) + now();
           self.nft = ctx.sender;  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
         // }
     }
 
     receive(msg: NftWithdrawal){
-         let ctx: Context = context();    
+        let ctx: Context = context();    
         require(ctx.sender != self.owner, "Invalid sender");  
         require(msg.nftAddress == self.nft, "check nft");     
         // if (self.lockedUntil!! > now()) {
@@ -116,7 +114,12 @@ contract Task4 with Deployable {
 
     get fun time(): Int {
         if(self.lockedUntil != null){      
-        return self.lockedUntil!! - now() ;    //correct. So its time before in timestamp seconds  
+           let t: Int = self.lockedUntil!! - now();
+           if(t > 0){
+            return t;
+           }else{
+            return 0;
+           }
         }else{
             return 0;
         }
