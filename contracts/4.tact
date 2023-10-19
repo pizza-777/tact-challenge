@@ -55,7 +55,7 @@ contract Task4 with Deployable {
     receive(msg: OwnershipAssigned){  
         let ctx: Context = context();          
         if (self.nft == null) { //if nft already holded - return nft back to the sender (nft contract)
-          self.lockedUntil = msg.forwardPayload.loadUint(32) + now();
+          self.lockedUntil = msg.forwardPayload.loadUint(32);
           self.nft = ctx.sender;  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
           return;
