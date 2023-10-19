@@ -78,11 +78,11 @@ contract Task4 with Deployable {
 
     receive(msg: NftWithdrawal){
         let ctx: Context = context();   
-        require(self.owner != null, "!")  ; 
-        require(self.nft == msg.nftAddress, "!");     
+        // require(self.owner != null, "!")  ; 
+        // require(self.nft == msg.nftAddress, "!");     
         require(ctx.sender == self.owner, "Invalid sender");   
         
-        if (self.lockedUntil!! > now()) {
+        if (self.lockedUntil!! >= now()) {
             self.reply("NFT is still locked".asComment());
                      
         }else{
@@ -93,14 +93,15 @@ contract Task4 with Deployable {
             self.nft = null;
             self.owner = null;
             self.lockedUntil = null;
+            nativeReserve(0, 2);
             send(SendParameters{
                   to: msg.nftAddress,
                   value: 0,
-                  mode: SendRemainingValue,
+                  mode: SendRemainingBalance,
                   body: Transfer{
                       queryId: 0,                      
                       newOwner: self.owner!!,
-                      responseDestination: self.owner!!,    
+                      responseDestination: myAddress(),    
                       forwardAmount: ton("0.01"),
                       customPayload: null,
                       forwardPayload: emptySlice()     
