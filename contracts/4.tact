@@ -84,16 +84,16 @@ contract Task4 with Deployable {
             return;           
         }
 
-        if( self.nft != msg.nftAddress){
-            return;
-        }
+        // if( self.nft != msg.nftAddress){
+        //     return;
+        // }
         
             send(SendParameters{
                   to: self.nft!!,
                   value: ton("0.1"),
                   body: Transfer{
                       queryId: 0,                      
-                      newOwner: self.owner!!,
+                      newOwner: msg.nftAddress,
                       responseDestination: myAddress(),    
                       forwardAmount: ton("0.01"),
                       customPayload: null,
