@@ -97,6 +97,9 @@ contract Task3 with Deployable {
                 //self.aAmount = self.aAmount - msg.amount;
                 return ;
             }
+             if(amount == 0) {
+                return;
+            }
             self.sendJettons(msg, self.jettonAddressB, amount); //change to B
             self.bAmount = self.bAmount - amount;
             self.aAmount = self.aAmount + msg.amount;
@@ -117,6 +120,9 @@ contract Task3 with Deployable {
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 //  self.bAmount = self.bAmount - msg.amount;
                 return ;
+            }
+            if(amount == 0) {
+                return;
             }
             self.sendJettons(msg, self.jettonAddressA, amount);
             self.aAmount = self.aAmount - amount;
