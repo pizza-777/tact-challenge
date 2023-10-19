@@ -83,7 +83,7 @@ contract Task3 with Deployable {
                 return ;
             }
             //return if has no A jettons or  for exchange
-            if (self.aAmount == 0 || self.bAmount == 0 || msg.amount > self.aAmount) {
+            if (self.aAmount == 0 || self.bAmount == 0 ) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return ;
             }
@@ -105,7 +105,7 @@ contract Task3 with Deployable {
                 return ;
             }
             //return if has no A jettons or  for exchange
-            if (self.bAmount == 0 || self.aAmount == 0 || msg.amount > self.bAmount) {
+            if (self.bAmount == 0 || self.aAmount == 0) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return ;
             }
