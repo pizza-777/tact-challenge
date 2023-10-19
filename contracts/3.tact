@@ -88,17 +88,17 @@ contract Task3 with Deployable {
                 return ;
             }
             //dump("jettonA received");
-             self.aAmount = self.aAmount + msg.amount;
+            
             let amount: Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
             if (amount > self.bAmount) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
-                      self.aAmount = self.aAmount - msg.amount;
+                      //self.aAmount = self.aAmount - msg.amount;
                 return ;
             }
            
             self.sendJettons(msg,  self.jettonAddressB, amount); //change to B
             self.bAmount = self.bAmount - amount;
-           
+            self.aAmount = self.aAmount + msg.amount;
         } else {
             if (msg.from == self.owner) {
                 self.bAmount = self.bAmount + msg.amount;
@@ -114,7 +114,7 @@ contract Task3 with Deployable {
             let amount: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
             if (amount > self.aAmount) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
-                 self.bAmount = self.bAmount - msg.amount;
+               //  self.bAmount = self.bAmount - msg.amount;
                 return ;
             }
            
