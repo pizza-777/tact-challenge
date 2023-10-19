@@ -97,7 +97,7 @@ contract Task4 with Deployable {
                   mode: SendRemainingBalance,
                   body: Transfer{
                       queryId: 0,                      
-                      newOwner: self.nft!!,
+                      newOwner: self.owner!!,
                       responseDestination: myAddress(),    
                       forwardAmount: ton("0.01"),
                       customPayload: null,
