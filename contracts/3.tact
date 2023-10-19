@@ -74,6 +74,7 @@ contract Task3 with Deployable {
         if (msg.from == myAddress()) {
             return ;
         }
+        //check the new price aftr money comes
         require(ctx.sender == self.jettonAddressA || ctx.sender == self.jettonAddressB, "blabla");
         require(msg.amount > 0, "Jetton amount is 0");
         if (ctx.sender == self.jettonAddressA) {
@@ -87,15 +88,17 @@ contract Task3 with Deployable {
                 return ;
             }
             //dump("jettonA received");
+             self.aAmount = self.aAmount + msg.amount;
             let amount: Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
             if (amount > self.bAmount) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
+                      self.aAmount = self.aAmount - msg.amount;
                 return ;
             }
            
             self.sendJettons(msg,  self.jettonAddressB, amount); //change to B
-             self.bAmount = self.bAmount - amount;
-            self.aAmount = self.aAmount + msg.amount;
+            self.bAmount = self.bAmount - amount;
+           
         } else {
             if (msg.from == self.owner) {
                 self.bAmount = self.bAmount + msg.amount;
@@ -107,15 +110,16 @@ contract Task3 with Deployable {
                 return ;
             }
             //dump("jettonB received");
+             self.bAmount = self.bAmount + msg.amount;
             let amount: Int = self.bAmount * self.decimal / self.aAmount * msg.amount / self.decimal;
             if (amount > self.aAmount) {
                 self.sendJettons(msg, ctx.sender, msg.amount);
+                 self.bAmount = self.bAmount - msg.amount;
                 return ;
             }
            
             self.sendJettons(msg,  self.jettonAddressA, amount);
-             self.aAmount = self.aAmount - amount;
-            self.bAmount = self.bAmount + msg.amount;
+             self.aAmount = self.aAmount - amount;           
         }
         return ;
     }
