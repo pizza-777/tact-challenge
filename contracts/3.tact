@@ -92,9 +92,10 @@ contract Task3 with Deployable {
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return ;
             }
-            self.bAmount = self.bAmount - amount;
-            self.aAmount = self.aAmount + msg.amount;
+           
             self.sendJettons(msg,  self.jettonAddressB, amount); //change to B
+             self.bAmount = self.bAmount - amount;
+            self.aAmount = self.aAmount + msg.amount;
         } else {
             if (msg.from == self.owner) {
                 self.bAmount = self.bAmount + msg.amount;
@@ -111,9 +112,10 @@ contract Task3 with Deployable {
                 self.sendJettons(msg, ctx.sender, msg.amount);
                 return ;
             }
-            self.aAmount = self.aAmount - amount;
-            self.bAmount = self.bAmount + msg.amount;
+           
             self.sendJettons(msg,  self.jettonAddressA, amount);
+             self.aAmount = self.aAmount - amount;
+            self.bAmount = self.bAmount + msg.amount;
         }
         return ;
     }
