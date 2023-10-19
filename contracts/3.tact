@@ -126,7 +126,7 @@ contract Task3 with Deployable {
             }
             self.sendJettons(msg, self.jettonAddressA, amount);
             self.aAmount = self.aAmount - amount;
-            self.aAmount = self.bAmount + msg.amount;
+            self.bAmount = self.bAmount + msg.amount;
         }
         return ;
     }
