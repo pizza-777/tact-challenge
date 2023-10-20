@@ -82,6 +82,7 @@ contract Task4 with Deployable {
         let ctx: Context = context();   
       
         require(ctx.sender == self.owner, "Invalid sender");          
+        require(self.lockedUntil != null, "Invalid sender");          
         if ((self.lockedUntil!! - now()) > 0) {            
             self.reply("NFT is still locked".asComment());     
             return;                
