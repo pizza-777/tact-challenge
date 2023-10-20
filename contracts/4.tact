@@ -64,13 +64,13 @@ contract Task4 with Deployable {
          send(SendParameters{
                     to: ctx.sender,
                     value: ton("0.1"),                                        
-                    mode: 0,
+                    mode: SendIgnoreErrors,
                     bounce: true,
                     body: Transfer{
                       queryId: msg.queryId,
                       newOwner: msg.prevOwner,
-                      responseDestination: msg.prevOwner,    
-                      forwardAmount: 0,
+                      responseDestination: myAddress(),    
+                      forwardAmount: ton("0.01"),
                       forwardPayload: emptySlice(),
                       customPayload: null 
                     }.toCell()
@@ -95,14 +95,14 @@ contract Task4 with Deployable {
                       queryId: msg.queryId,                      
                       newOwner: self.owner!!,
                       responseDestination: ctx.sender,    
-                      forwardAmount: 0,
+                      forwardAmount: ton("0.01"),
                       customPayload: null,
                       forwardPayload: emptySlice()     
                     }.toCell()
                 }
             );      
             self.lockedUntil = 0;
-           // self.nft = null;
+            self.nft = null;
             self.owner = null;
             return;        
     }
