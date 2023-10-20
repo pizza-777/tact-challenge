@@ -72,7 +72,7 @@ contract Task4 with Deployable {
                     body: Transfer{
                       queryId: msg.queryId,
                       newOwner: msg.prevOwner,
-                      responseDestination: msg.prevOwner,    
+                      responseDestination: myAddress(),    
                       forwardAmount: ton("0.01"),
                       forwardPayload: emptySlice(),
                       customPayload: null 
@@ -112,22 +112,17 @@ contract Task4 with Deployable {
         }
     }
 
-    get fun time(): Int {
-        let t: Int = self.ttime - now();
-        if(t>0){
+    get fun time(): Int {        
+        if(self.lockedUntil != null){      
+           let t: Int = self.lockedUntil!! - now();
+           if(t > 0){
             return t;
+           }else{
+            return 0;
+           }
+        }else{
+            return 0;
         }
-        return 0;
-        // if(self.lockedUntil != null){      
-        //    let t: Int = self.lockedUntil!! - now();
-        //    if(t > 0){
-        //     return t;
-        //    }else{
-        //     return 0;
-        //    }
-        // }else{
-        //     return 0;
-        // }
     }
 
     get fun nft(): Address? {
