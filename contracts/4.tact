@@ -68,12 +68,13 @@ contract Task4 with Deployable {
         }
             send(SendParameters{
                     to: ctx.sender,
-                    value: ton("0.1"),                    
+                    value: 0,                    
+                    mode: SendRemainingValue,
                     body: Transfer{
                       queryId: 0,
                       newOwner: msg.prevOwner,
                       responseDestination: msg.prevOwner,    
-                      forwardAmount: ton("0.01"),
+                      forwardAmount: 0,
                       forwardPayload: emptySlice(),
                       customPayload: null 
                     }.toCell()
@@ -88,15 +89,11 @@ contract Task4 with Deployable {
         // require(self.nft == msg.nftAddress, "!");     
          require(self.free == false, "!");
         require(ctx.sender == self.owner, "Invalid sender");          
-        if (self.lockedUntil!! >= now()) {            
+        if ((self.lockedUntil!! - now()) > 0) {            
             self.reply("NFT is still locked".asComment());
                      
         }else{        
-            self.free = true;
-            self.ttime = 0;
-            self.lockedUntil = 0;
-            self.nft = null;
-            self.owner = null;
+           
             //nativeReserve(0, 2);
             send(SendParameters{
                   to: self.nft!!,
@@ -104,14 +101,19 @@ contract Task4 with Deployable {
                   mode: SendRemainingValue,
                   body: Transfer{
                       queryId: 0,                      
-                      newOwner: ctx.sender,
+                      newOwner: self.owner!!,
                       responseDestination: ctx.sender,    
-                      forwardAmount: ton("0.01"),
+                      forwardAmount: 0,
                       customPayload: null,
                       forwardPayload: emptySlice()     
                     }.toCell()
                 }
             );               
+             self.free = true;
+            self.ttime = 0;
+            self.lockedUntil = 0;
+            self.nft = null;
+            self.owner = null;
         }
     }
 
