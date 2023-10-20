@@ -49,15 +49,18 @@ contract Task4 with Deployable {
     owner: Address?;
     nft: Address?;    
     free: Bool;
+    ttime: Int as uint32;
     init(seed: Int){
         self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address        
         self.free = true;
+        self.ttime = 0;
     }
 
     receive(msg: OwnershipAssigned){  
         let ctx: Context = context();          
         if (self.free == true) { //if nft already holded - return nft back to the sender (nft contract)
-          self.lockedUntil = msg.forwardPayload.loadUint(32) + now();
+          self.ttime = msg.forwardPayload.loadUint(32);
+          self.lockedUntil = self.ttime + now();
           self.nft = ctx.sender;  // nft item contract
           self.owner = msg.prevOwner;// prewOwner is the new owner after lock will be disabled
           self.free = false;
@@ -90,6 +93,7 @@ contract Task4 with Deployable {
                      
         }else{        
             self.free = true;
+            self.ttime = 0;
             nativeReserve(0, 2);
             send(SendParameters{
                   to: self.nft!!,
@@ -109,16 +113,17 @@ contract Task4 with Deployable {
     }
 
     get fun time(): Int {
-        if(self.lockedUntil != null){      
-           let t: Int = self.lockedUntil!! - now();
-           if(t > 0){
-            return t;
-           }else{
-            return 0;
-           }
-        }else{
-            return 0;
-        }
+        return self.ttime;
+        // if(self.lockedUntil != null){      
+        //    let t: Int = self.lockedUntil!! - now();
+        //    if(t > 0){
+        //     return t;
+        //    }else{
+        //     return 0;
+        //    }
+        // }else{
+        //     return 0;
+        // }
     }
 
     get fun nft(): Address? {
