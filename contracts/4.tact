@@ -116,9 +116,11 @@ contract Task4 with Deployable {
     }
 
     get fun time(): Int {        
-        
+        if(self.lockedUntil != null && self.lockedUntil!! > 0){
           return self.lockedUntil!! - now();
-         
+        }else {
+            return 0;
+        }         
     }
 
     get fun nft(): Address? {
