@@ -115,7 +115,7 @@ contract Task4 with Deployable {
 
     get fun time(): Int {        
         if(self.lockedUntil != null){      
-           let t: Int = self.lockedUntil!! - now();
+           let t: Int = now() - self.lockedUntil!!;
            if(t > 0){
             return t;
            }else{
