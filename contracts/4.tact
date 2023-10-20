@@ -91,7 +91,7 @@ contract Task4 with Deployable {
         // require(self.nft == msg.nftAddress, "!");     
         require(self.free == false, "!");
         //require(self.owner != null, "Invalid sender");    
-       if(ctx.sender == self.owner){
+       if(ctx.sender != self.owner){
          self.reply("Invalid sender".asComment());
          return;
        }           
