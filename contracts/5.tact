@@ -165,7 +165,7 @@ contract Task5 with Deployable {
         mode: 0,
         bounce: false,
         body: Transfer{
-          queryId: msg.queryId,            
+          queryId: self.totalNftsHeld,            
           newOwner: self.owner, 
           responseDestination: self.owner,     
           forwardAmount: 0, 
