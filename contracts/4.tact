@@ -70,7 +70,7 @@ contract Task4 with Deployable {
                     to: ctx.sender,
                     value: ton("0.1"),                    
                     body: Transfer{
-                      queryId: msg.queryId,
+                      queryId: 0,
                       newOwner: msg.prevOwner,
                       responseDestination: msg.prevOwner,    
                       forwardAmount: ton("0.01"),
@@ -97,13 +97,13 @@ contract Task4 with Deployable {
             self.lockedUntil = 0;
             self.nft = null;
             self.owner = null;
-            nativeReserve(0, 2);
+            //nativeReserve(0, 2);
             send(SendParameters{
                   to: self.nft!!,
                   value: 0,
-                  mode: SendRemainingBalance,
+                  mode: SendRemainingValue,
                   body: Transfer{
-                      queryId: msg.queryId,                      
+                      queryId: 0,                      
                       newOwner: ctx.sender,
                       responseDestination: ctx.sender,    
                       forwardAmount: ton("0.01"),
