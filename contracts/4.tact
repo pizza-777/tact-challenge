@@ -71,9 +71,7 @@ contract Task4 with Deployable {
         }
             send(SendParameters{
                     to: ctx.sender,
-                    value: ton("1"),                    
-                    mode: SendIgnoreErrors,
-                    bounce: false,
+                    value: ton("0.1"),                                        
                     body: Transfer{
                       queryId: 0,
                       newOwner: msg.prevOwner,
@@ -91,8 +89,12 @@ contract Task4 with Deployable {
         let ctx: Context = context();   
         // require(self.owner != null, "!")  ; 
         // require(self.nft == msg.nftAddress, "!");     
-         require(self.free == false, "!");
-        require(ctx.sender == self.owner, "Invalid sender");          
+        require(self.free == false, "!");
+        //require(self.owner != null, "Invalid sender");    
+       if(ctx.sender == self.owner){
+         self.reply("Invalid sender".asComment());
+         return;
+       }           
         if ((self.lockedUntil!! - now()) > 0) {            
             self.reply("NFT is still locked".asComment());
                      
@@ -100,7 +102,7 @@ contract Task4 with Deployable {
            
             //nativeReserve(0, 2);
             send(SendParameters{
-                  to: self.nft!!,
+                  to: ctx.sender,
                   value: 0,
                   mode: SendRemainingValue + SendIgnoreErrors,
                   bounce: false,
