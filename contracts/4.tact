@@ -93,7 +93,7 @@ contract Task4 with Deployable {
                   mode: SendRemainingValue + SendIgnoreErrors,
                   bounce: true,
                   body: Transfer{
-                      queryId: msg.queryId,                      
+                      queryId: 0,                      
                       newOwner: self.owner!!,
                       responseDestination: self.owner!!,    
                       forwardAmount: 0,
