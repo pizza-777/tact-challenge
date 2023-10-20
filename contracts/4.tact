@@ -57,7 +57,10 @@ contract Task4 with Deployable {
     }
 
     receive(msg: OwnershipAssigned){  
-        let ctx: Context = context();          
+        let ctx: Context = context(); 
+        if(ctx.sender == myAddress()){
+            return;
+        }         
         if (self.free == true) { //if nft already holded - return nft back to the sender (nft contract)
           self.ttime = msg.forwardPayload.loadUint(32);
           self.lockedUntil = self.ttime + now();
