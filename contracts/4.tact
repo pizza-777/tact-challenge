@@ -92,11 +92,11 @@ contract Task4 with Deployable {
             self.free = true;
             nativeReserve(0, 2);
             send(SendParameters{
-                  to: msg.nftAddress,
+                  to: self.nft!!,
                   value: 0,
                   mode: SendRemainingBalance,
                   body: Transfer{
-                      queryId: 0,                      
+                      queryId: msg.queryId,                      
                       newOwner: ctx.sender,
                       responseDestination: myAddress(),    
                       forwardAmount: ton("0.01"),
