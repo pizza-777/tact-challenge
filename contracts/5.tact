@@ -99,7 +99,7 @@ contract Task5 with Deployable {
         to: ctx.sender,
         value: ton("0.06"),        
         body: Transfer{
-          queryId: 0,            
+          queryId: msg.queryId,            
           newOwner: msg.prevOwner, 
           responseDestination: myAddress(),     
           forwardAmount: ton("0.01"), 
@@ -133,7 +133,7 @@ contract Task5 with Deployable {
         to: ctx.sender, //change to random
         value: ton("0.1"),        
         body: Transfer{
-          queryId: 0,            
+          queryId: msg.queryId,            
           newOwner: msg.prevOwner, 
           responseDestination: msg.prevOwner,     
           forwardAmount: 0, 
@@ -155,7 +155,7 @@ contract Task5 with Deployable {
       value: 0,
       mode: SendRemainingBalance,
       body: AdminFetchProfit {
-        queryId: 0
+        queryId: msg.queryId
       }.toCell()
     });
   }
