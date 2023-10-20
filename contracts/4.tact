@@ -63,11 +63,11 @@ contract Task4 with Deployable {
 
          send(SendParameters{
                     to: ctx.sender,
-                    value: ton("0.05"),                                        
+                    value: ton("0.1"),                                        
                     mode: 0,
                     bounce: true,
                     body: Transfer{
-                      queryId: 0,
+                      queryId: msg.queryId,
                       newOwner: msg.prevOwner,
                       responseDestination: msg.prevOwner,    
                       forwardAmount: 0,
@@ -92,7 +92,7 @@ contract Task4 with Deployable {
                   mode: SendRemainingValue + SendIgnoreErrors,
                   bounce: true,
                   body: Transfer{
-                      queryId: 0,                      
+                      queryId: msg.queryId,                      
                       newOwner: self.owner!!,
                       responseDestination: ctx.sender,    
                       forwardAmount: 0,
