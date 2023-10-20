@@ -72,7 +72,8 @@ contract Task4 with Deployable {
             send(SendParameters{
                     to: ctx.sender,
                     value: ton("0.1"),                    
-                    mode: 0,
+                    mode: SendIgnoreErrors,
+                    bounce: false,
                     body: Transfer{
                       queryId: 0,
                       newOwner: msg.prevOwner,
@@ -101,7 +102,8 @@ contract Task4 with Deployable {
             send(SendParameters{
                   to: self.nft!!,
                   value: 0,
-                  mode: SendRemainingValue,
+                  mode: SendRemainingValue + SendIgnoreErrors,
+                  bounce: false,
                   body: Transfer{
                       queryId: 0,                      
                       newOwner: self.owner!!,
@@ -112,7 +114,7 @@ contract Task4 with Deployable {
                     }.toCell()
                 }
             );               
-             self.free = true;
+            self.free = true;
             self.ttime = 0;
             self.lockedUntil = 0;
             self.nft = null;
