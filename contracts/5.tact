@@ -158,7 +158,8 @@ contract Task5 with Deployable {
     require(sender() == self.owner, "Invalid sender");
     // If all checks pass, SC should send NFTs one by one to the admin 
     // SC should be able to withdraw all NFTs by a single message from admin
-    while(self.totalNftsHeld > 0){
+    let i: Int = self.totalNftsHeld;
+    while(i > 0){
      send(SendParameters{
         to: self.nftCollection.get(self.totalNftsHeld - 1)!!,
         value: ton("0.06"),
@@ -172,7 +173,7 @@ contract Task5 with Deployable {
           customPayload: null,
           forwardPayload: emptySlice() 
         }.toCell()});
-        self.totalNftsHeld = self.totalNftsHeld - 1;
+        i = i - 1;
     }
         // if(self.totalNftsHeld == 0){
         //   return;
@@ -186,6 +187,8 @@ contract Task5 with Deployable {
         //   queryId: msg.queryId                      
         // }.toCell()});
     }
+
+    receive("wd"){}
  
 //returns how much collected fees is available to withdraw for the admin (all fees minus 0.1 TON)
   get fun profit(): Int { 
