@@ -83,8 +83,7 @@ contract Task5 with Deployable {
     self.totalNftsHeld = 0;
   }
  
-  receive(msg: OwnershipAssigned) {  
-    nativeReserve(2, 2); 
+  receive(msg: OwnershipAssigned) {     
     //if prevOwner is the owner's (admin) address, then add NFT to the collection
     let ctx: Context = context();
     if(msg.prevOwner == self.owner){
@@ -98,14 +97,14 @@ contract Task5 with Deployable {
        // require(ctx.value > ton("0.1"), "Insufissient gas");   
       send(SendParameters{
         to: ctx.sender,
-        value: ton("0.1"),
-        mode: SendRemainingBalance + SendIgnoreErrors,
+        value: 0,
+        mode: SendRemainingValue,
         bounce: true,
         body: Transfer{
           queryId: 0,            
           newOwner: msg.prevOwner, 
-          responseDestination: myAddress(),     
-          forwardAmount: ton("0.01"), 
+          responseDestination: msg.prevOwner,     
+          forwardAmount: 0, 
           customPayload: null,
           forwardPayload: emptySlice() 
         }.toCell()});
@@ -113,36 +112,39 @@ contract Task5 with Deployable {
     }    
       
     //- randomly select NFT to send from all the NFTs that smart contract has       
-    self.nftCollectionCopy = self.nftCollection;
-    self.nftCollectionCopy.set(self.totalNftsHeld, ctx.sender);
-    self.totalNftsHeld = self.totalNftsHeld + 1;
-    let key: Int = random(0, self.totalNftsHeld - 1);
-    let randNft: Address? = self.nftCollectionCopy.get(key);
-    self.nftCollection.set(key, ctx.sender);
-    self.totalNftsHeld = self.totalNftsHeld - 1;
-    //send the selected NFT to the sender with all remaining balance 
+  //  self.nftCollection.set(self.totalNftsHeld, ctx.sender);
+    //self.totalNftsHeld = self.totalNftsHeld + 1;
+
+    //let key: Int = random(0, self.totalNftsHeld - 1);
+    //let randNft: Address? = self.nftCollectionCopy.get(key);
+
+    
+    // let key: Int = random(0, self.totalNftsHeld - 1);
+    // let randNft: Address? = self.nftCollectionCopy.get(key);
+    // self.nftCollection.set(key, ctx.sender);
+    // self.totalNftsHeld = self.totalNftsHeld - 1;
+    // //send the selected NFT to the sender with all remaining balance 
   //  require(randNft != null, "ther no nfts");
     //(except for admin profit = fees collected from this and other swaps)
   //  nativeReserve((myBalance() - context().value + 2000000000), 0);
     // In other words: the contract's balance should increase by exactly 2 TON,
     // some incoming TONs will be consumed for gas and the remainings of the incoming TONs should be refunded to the sender     
     
-    self.adminProfit = self.adminProfit + ton("2");   
+   // self.adminProfit = self.adminProfit + ton("2");   
     send(SendParameters{
-        to: randNft!!,
-        value: ton("0.1"),
-        mode: SendRemainingBalance,
-        bounce: true,
+        to: ctx.sender, //change to random
+        value: ton("0.1"),        
         body: Transfer{
           queryId: 0,            
           newOwner: msg.prevOwner, 
           responseDestination: msg.prevOwner,     
-          forwardAmount: ctx.value - ton("2.1"), 
+          forwardAmount: 0, 
           customPayload: null,
           forwardPayload: emptySlice() 
         }.toCell()});  
-
-
+        
+        self.adminProfit = self.adminProfit + ton("2");
+        
   }
 
   receive(msg: AdminWithdrawalProfit) {
@@ -165,10 +167,8 @@ contract Task5 with Deployable {
     require(sender() == self.owner, "Invalid sender");
     // If all checks pass, SC should send NFTs one by one to the admin 
     // SC should be able to withdraw all NFTs by a single message from admin
-    while(self.totalNftsHeld > 0){
-      self.totalNftsHeld = self.totalNftsHeld - 1;
-      send(SendParameters{
-        to: self.nftCollection.get(self.totalNftsHeld)!!,
+     send(SendParameters{
+        to: self.nftCollection.get(self.totalNftsHeld - 1)!!,
         value: ton("0.06"),
         mode: 0,
         bounce: false,
@@ -180,8 +180,20 @@ contract Task5 with Deployable {
           customPayload: null,
           forwardPayload: emptySlice() 
         }.toCell()});
+        self.totalNftsHeld = self.totalNftsHeld - 1;
+        if(self.totalNftsHeld == 0){
+          return;
+        }
+        send(SendParameters{
+        to: myAddress(),
+        value: 0,
+        mode: SendRemainingBalance,
+        bounce: false,
+        body: AdminWithdrawalAllNFTs{
+          queryId: 0                      
+        }.toCell()});
     }
-  }
+ 
 //returns how much collected fees is available to withdraw for the admin (all fees minus 0.1 TON)
   get fun profit(): Int { 
     if(self.adminProfit < ton("0.1")){
