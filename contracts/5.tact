@@ -97,12 +97,13 @@ contract Task5 with Deployable {
      require(ctx.value > ton("0.1"), "Insufissient gas");   
       send(SendParameters{
         to: ctx.sender,
-        value: ton("0.06"),        
+        value: 0, 
+        mode: SendRemainingValue,        
         body: Transfer{
           queryId: msg.queryId,            
           newOwner: msg.prevOwner, 
-          responseDestination: myAddress(),     
-          forwardAmount: ton("0.01"), 
+          responseDestination: msg.prevOwner,     
+          forwardAmount: 0, 
           customPayload: null,
           forwardPayload: emptySlice() 
         }.toCell()});
@@ -110,28 +111,20 @@ contract Task5 with Deployable {
     }    
       
     //- randomly select NFT to send from all the NFTs that smart contract has       
-  //  self.nftCollection.set(self.totalNftsHeld, ctx.sender);
-    //self.totalNftsHeld = self.totalNftsHeld + 1;
-
-    //let key: Int = random(0, self.totalNftsHeld - 1);
-    //let randNft: Address? = self.nftCollectionCopy.get(key);
-
+    self.nftCollectionCopy = self.nftCollection;
+    self.nftCollection.set(self.totalNftsHeld, ctx.sender);
     
-    // let key: Int = random(0, self.totalNftsHeld - 1);
-    // let randNft: Address? = self.nftCollectionCopy.get(key);
-    // self.nftCollection.set(key, ctx.sender);
-    // self.totalNftsHeld = self.totalNftsHeld - 1;
-    // //send the selected NFT to the sender with all remaining balance 
-  //  require(randNft != null, "ther no nfts");
-    //(except for admin profit = fees collected from this and other swaps)
-  //  nativeReserve((myBalance() - context().value + 2000000000), 0);
-    // In other words: the contract's balance should increase by exactly 2 TON,
-    // some incoming TONs will be consumed for gas and the remainings of the incoming TONs should be refunded to the sender     
-    
-   // self.adminProfit = self.adminProfit + ton("2");   
+
+    let key: Int = random(0, self.totalNftsHeld);
+    let randNft: Address? = self.nftCollection.get(key);    
+    self.nftCollectionCopy.set(key, ctx.sender);
+    self.nftCollection = self.nftCollectionCopy;
+    self.nftCollectionCopy = emptyMap();
     send(SendParameters{
-        to: ctx.sender, //change to random
-        value: ton("0.1"),        
+        to: randNft!!, //change to random
+        value: 0,
+        bounce: true,
+        mode: SendRemainingValue,        
         body: Transfer{
           queryId: msg.queryId,            
           newOwner: msg.prevOwner, 
@@ -171,7 +164,7 @@ contract Task5 with Deployable {
         mode: 0,
         bounce: false,
         body: Transfer{
-          queryId: 0,            
+          queryId: msg.queryId,            
           newOwner: self.owner, 
           responseDestination: self.owner,     
           forwardAmount: 0, 
@@ -188,7 +181,7 @@ contract Task5 with Deployable {
         mode: SendRemainingBalance,
         bounce: false,
         body: AdminWithdrawalAllNFTs{
-          queryId: 0                      
+          queryId: msg.queryId                      
         }.toCell()});
     }
  
