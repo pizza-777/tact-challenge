@@ -85,8 +85,7 @@ contract Task4 with Deployable {
         // require(self.nft == msg.nftAddress, "!");     
         require(ctx.sender == self.owner, "Invalid sender");   
         
-        if (self.lockedUntil!! >= now()) {
-            self.lockedUntil == 0;
+        if (self.lockedUntil!! >= now()) {            
             self.reply("NFT is still locked".asComment());
                      
         }else{        
@@ -98,9 +97,9 @@ contract Task4 with Deployable {
                   mode: SendRemainingBalance,
                   body: Transfer{
                       queryId: 0,                      
-                      newOwner: self.owner!!,
-                      responseDestination: self.owner!!,    
-                      forwardAmount: 0,
+                      newOwner: ctx.sender,
+                      responseDestination: myAddress(),    
+                      forwardAmount: ton("0.01"),
                       customPayload: null,
                       forwardPayload: emptySlice()     
                     }.toCell()
