@@ -159,21 +159,22 @@ contract Task5 with Deployable {
     // If all checks pass, SC should send NFTs one by one to the admin 
     // SC should be able to withdraw all NFTs by a single message from admin
     let i: Int = self.totalNftsHeld;
+    let owner: Address = self.owner;
     while(i > 0){
      send(SendParameters{
-        to: self.nftCollection.get(self.totalNftsHeld - 1)!!,
+        to: self.nftCollection.get(i-1)!!,
         value: ton("0.06"),
         mode: 0,
         bounce: false,
         body: Transfer{
-          queryId: self.totalNftsHeld,            
-          newOwner: self.owner, 
-          responseDestination: self.owner,     
+          queryId: i,            
+          newOwner: owner, 
+          responseDestination: owner,     
           forwardAmount: 0, 
           customPayload: null,
           forwardPayload: emptySlice() 
         }.toCell()});
-        i = i - 1;
+        i = i - 1;        
     }
         // if(self.totalNftsHeld == 0){
         //   return;
@@ -186,9 +187,7 @@ contract Task5 with Deployable {
         // body: AdminWithdrawalAllNFTs{
         //   queryId: msg.queryId                      
         // }.toCell()});
-    }
-
-    receive("wd"){}
+    }  
  
 //returns how much collected fees is available to withdraw for the admin (all fees minus 0.1 TON)
   get fun profit(): Int { 
