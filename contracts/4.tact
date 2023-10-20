@@ -64,7 +64,7 @@ contract Task4 with Deployable {
          send(SendParameters{
                     to: ctx.sender,
                     value: ton("0.05"),                                        
-                    mode: SendRemainingValue,
+                    mode: 0,
                     bounce: true,
                     body: Transfer{
                       queryId: 0,
