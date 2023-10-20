@@ -71,7 +71,7 @@ contract Task4 with Deployable {
         }
             send(SendParameters{
                     to: ctx.sender,
-                    value: ton("0.1"),                    
+                    value: ton("1"),                    
                     mode: SendIgnoreErrors,
                     bounce: false,
                     body: Transfer{
