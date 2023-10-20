@@ -67,7 +67,7 @@ contract Task4 with Deployable {
                     to: ctx.sender,
                     value: ton("0.1"),                    
                     body: Transfer{
-                      queryId: 0,
+                      queryId: msg.queryId,
                       newOwner: msg.prevOwner,
                       responseDestination: msg.prevOwner,    
                       forwardAmount: ton("0.01"),
