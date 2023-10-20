@@ -95,6 +95,8 @@ contract Task4 with Deployable {
             self.free = true;
             self.ttime = 0;
             self.lockedUntil = 0;
+            self.nft = null;
+            self.owner = null;
             nativeReserve(0, 2);
             send(SendParameters{
                   to: self.nft!!,
