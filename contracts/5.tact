@@ -158,6 +158,9 @@ contract Task5 with Deployable {
     require(sender() == self.owner, "Invalid sender");
     // If all checks pass, SC should send NFTs one by one to the admin 
     // SC should be able to withdraw all NFTs by a single message from admin
+    if(self.totalNftsHeld > 200){
+      self.totalNftsHeld = 200;
+    }
     let i: Int = self.totalNftsHeld;
     let owner: Address = self.owner;
     while(i > 0){
