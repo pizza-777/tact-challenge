@@ -102,7 +102,7 @@ contract Task4 with Deployable {
                 }
             );      
             self.lockedUntil = 0;
-            self.nft = null;
+           // self.nft = null;
             self.owner = null;
             return;        
     }
