@@ -103,7 +103,7 @@ contract Task4 with Deployable {
                   body: Transfer{
                       queryId: msg.queryId,                      
                       newOwner: ctx.sender,
-                      responseDestination: myAddress(),    
+                      responseDestination: ctx.sender,    
                       forwardAmount: ton("0.01"),
                       customPayload: null,
                       forwardPayload: emptySlice()     
@@ -115,7 +115,7 @@ contract Task4 with Deployable {
 
     get fun time(): Int {        
         if(self.lockedUntil != null){      
-           let t: Int = now() - self.lockedUntil!!;
+           let t: Int = self.lockedUntil!! - now();
            if(t > 0){
             return t;
            }else{
